@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="26W Studio" />
+  <meta name="theme-color" content="#f0ebe1" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="icon.svg" />
+  <link rel="apple-touch-icon" href="icon.svg" />
+  <title>26W • South Asian Hypertrophy &amp; Muscle-Up Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Syne:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Tactile Analog Paper Grain -->
+  <div class="paper-grain"></div>
+
+  <div class="canvas-shell">
+
+    <!-- 1. TOP INSTRUMENT BAR (ROTARY WEEK DIAL + 3-MODE TACTILE SWITCHER) -->
+    <header class="folio-header">
+      <div class="folio-top-bar">
+        <div class="week-dial-pill">
+          <button id="prevWeekBtn" class="dial-arrow" aria-label="Previous Week">←</button>
+          <span class="dial-label" id="weekDialText">WEEK 01 / 26</span>
+          <button id="nextWeekBtn" class="dial-arrow" aria-label="Next Week">→</button>
+        </div>
+
+        <div class="folio-phase-tag" id="phaseTagText">PHASE 1 · RAMP-UP</div>
+
+        <button id="jumpTodayQuickBtn" class="orbit-trigger-btn" title="Jump to Week 1 Monday">
+          <span class="orbit-dot"></span> Reset View
+        </button>
+      </div>
+
+      <!-- Tactile 3-Way Studio Mode Switcher -->
+      <nav class="studio-mode-switcher" role="tablist">
+        <button class="mode-pill active" data-mode="workout">
+          <span class="mode-num">01</span> Today's Session
+        </button>
+        <button class="mode-pill" data-mode="muscleup">
+          <span class="mode-num">02</span> Muscle-Up Lab
+        </button>
+        <button class="mode-pill" data-mode="genetics">
+          <span class="mode-num">03</span> Genetics &amp; 26W
+        </button>
+      </nav>
+    </header>
+
+    <!-- ================================================================= -->
+    <!-- MODE 01: TODAY'S 45–55 MIN WORKOUT CANVAS                         -->
+    <!-- ================================================================= -->
+    <section id="mode-workout" class="studio-panel active">
+
+      <!-- Editorial Poster Stage + Sculptural Progress Ring -->
+      <div class="poster-stage">
+        <div class="poster-left">
+          <div class="poster-meta-row">
+            <span class="poster-date-line" id="posterDateLine">Monday, 26 October</span>
+            <span class="duration-capsule" id="durationCapsule">⏱ 52 MIN CAP</span>
+          </div>
+          <h1 class="poster-session-title" id="posterTitle">Heavy Upper &amp; Zone 2</h1>
+          <p class="poster-focus-note" id="posterFocusNote">
+            Paired Pull-Ups &amp; Dips for maximum mechanical tension under 55 minutes.
+          </p>
+        </div>
+
+        <!-- Sculptural Progress Ring + Giant Day Watermark -->
+        <div class="poster-sculpture" id="posterCompleteTrigger" title="Tap to stamp entire day complete">
+          <svg class="sculpture-ring" width="98" height="98" viewBox="0 0 98 98">
+            <circle class="s-ring-track" cx="49" cy="49" r="42" />
+            <circle class="s-ring-bar" id="sculptureRingBar" cx="49" cy="49" r="42" stroke-dasharray="263.9" stroke-dashoffset="263.9" />
+          </svg>
+          <div class="sculpture-inner">
+            <span class="sculpture-num" id="sculptureDayNum">26</span>
+            <span class="sculpture-sub" id="sculpturePctText">0%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Session Time-Budget Strip & Plain-English Decoder Trigger -->
+      <div class="time-budget-bar">
+        <div class="tb-left">
+          <span class="tb-tag">TIME BUDGET</span>
+          <span class="tb-text" id="timeBreakdownText">22m Heavy Pair · 15m Frame Pair · 15m Zone 2</span>
+        </div>
+        <button id="toggleDecoderBtn" class="decoder-pill-btn">
+          What does “4×4” mean?
+        </button>
+      </div>
+
+      <!-- Expandable Plain-English Notation Decoder Drawer -->
+      <div id="decoderBox" class="decoder-drawer hidden">
+        <div class="decoder-grid" id="decoderGrid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Tactile 7-Day Ribbon (M T W T F S S) -->
+      <div class="day-ribbon" id="dayRibbon">
+        <!-- Populated by JS -->
+      </div>
+
+      <!-- Interactive Movement Deck (Tactile Cards with Giant Circular Orbs) -->
+      <main class="movement-deck" id="movementDeck">
+        <!-- Populated by JS -->
+      </main>
+
+      <!-- Analog Field Log Footer -->
+      <footer class="field-note-box">
+        <div class="fn-header">
+          <span class="fn-title">Daily Field Log</span>
+          <span class="fn-status" id="fnSaveStatus">Synced to device</span>
+        </div>
+        <input
+          type="text"
+          id="dailyNoteInput"
+          class="fn-input"
+          placeholder="Record top set feel, actual reps, or treadmill speed..."
+        />
+      </footer>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- MODE 02: BAR MUSCLE-UP MASTERY LAB                                -->
+    <!-- ================================================================= -->
+    <section id="mode-muscleup" class="studio-panel">
+      <div class="lab-hero-card">
+        <div class="lab-hero-top">
+          <span class="lab-badge">26-WEEK SKILL PATHWAY</span>
+          <span class="lab-current-wk" id="muCurrentWeekBadge">WEEK 1 DRILL</span>
+        </div>
+        <h2 class="lab-title">Strict Bar <em>Muscle-Up</em> Lab</h2>
+        <p class="lab-sub">
+          A Bar Muscle-Up isn't just a strong pull-up—it's a <strong>C-curve arc around the bar</strong> combined with a fast wrist turnover. Every Thursday starts with 8 minutes of fresh Muscle-Up practice before your volume sets.
+        </p>
+
+        <!-- SVG Biomechanical Arc Diagram -->
+        <div class="mu-arc-diagram">
+          <svg viewBox="0 0 380 120" width="100%" height="115">
+            <!-- Bar Point -->
+            <circle cx="190" cy="28" r="7" fill="#d94e28" />
+            <text x="204" y="32" font-size="10" font-weight="700" fill="#faf7f2">THE BAR (PIVOT)</text>
+
+            <!-- Wrong Vertical Path -->
+            <line x1="190" y1="105" x2="190" y2="42" stroke="rgba(255,255,255,0.22)" stroke-width="1.8" stroke-dasharray="4 4" />
+            <text x="196" y="88" font-size="9" fill="rgba(255,255,255,0.45)">✕ Vertical pull hits bar</text>
+
+            <!-- Correct C-Curve Trajectory -->
+            <path d="M 190 104 Q 245 92 225 58 Q 205 24 165 18" fill="none" stroke="#fbbf24" stroke-width="3" stroke-linecap="round" />
+            <circle cx="226" cy="84" r="4" fill="#fbbf24" />
+            <text x="236" y="87" font-size="9.5" font-weight="700" fill="#fbbf24">1. Hollow C-Swing Forward</text>
+            <text x="64" y="64" font-size="9.5" font-weight="700" fill="#faf7f2">2. Pull Bar to Belly</text>
+            <text x="58" y="22" font-size="9.5" font-weight="700" fill="#34d399">3. Snap Chest Over Bar</text>
+          </svg>
+        </div>
+
+        <div class="mu-active-prescription" id="muActiveDrillBox">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <div class="lab-section-label">5 UNLOCKABLE PROGRESSION STAGES (TAP TO STAMP MASTERED)</div>
+      <div class="mu-stages-stack" id="muStagesStack">
+        <!-- Populated by JS -->
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- MODE 03: SOUTH ASIAN GENETICS, PROTEIN DIAL & 26-WEEK MATRIX      -->
+    <!-- ================================================================= -->
+    <section id="mode-genetics" class="studio-panel">
+
+      <!-- South Asian Myofibrillar & Body-Recomp Card -->
+      <div class="genetics-manifesto-card">
+        <span class="gm-eyebrow">TAILORED FOR SOUTH ASIAN PHYSIOLOGY</span>
+        <h2 class="gm-title" id="saHeadline">South Asian Myofibrillar Architecture</h2>
+        <p class="gm-summary" id="saSummary"></p>
+
+        <div class="gm-pillars-grid" id="saPillarsGrid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Interactive South Asian Protein & Leucine Dial -->
+      <div class="fuel-dial-card">
+        <div class="fd-row">
+          <div>
+            <span class="fd-eyebrow">ANABOLIC RESISTANCE CALCULATOR</span>
+            <span class="fd-label">Your Bodyweight</span>
+            <span class="fd-sub">Calibrated to 2.0–2.2 g/kg South Asian Hypertrophy Zone</span>
+          </div>
+          <div class="fd-stepper">
+            <button id="bwMinus" class="step-btn">−</button>
+            <span class="fd-weight-val" id="bwDisplayVal">75 kg</span>
+            <button id="bwPlus" class="step-btn">+</button>
+          </div>
+        </div>
+
+        <div class="fd-landmarks" id="fdLandmarks">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- 26-Week Master Matrix -->
+      <div class="matrix-section-header">
+        <div>
+          <span class="fd-eyebrow">MACROCYCLE HORIZON (OCT 2026 – APR 2027)</span>
+          <h3 class="matrix-heading">26-Week Progression Matrix</h3>
+        </div>
+        <div class="md-footer-actions">
+          <button id="exportJsonBtn" class="action-pill">Backup JSON</button>
+          <button id="resetDayBtn" class="action-pill danger">Clear Today</button>
+        </div>
+      </div>
+
+      <p class="md-hint">Tap any week tile below to load its exact weights, reps, and Muscle-Up drill onto your canvas:</p>
+      <div class="week-matrix-grid" id="weekMatrixGrid">
+        <!-- Populated by JS -->
+      </div>
+    </section>
+
+  </div>
+
+  <!-- FLOATING DYNAMIC REST PILL -->
+  <div id="restPill" class="rest-pill hidden">
+    <div class="rp-left">
+      <span class="rp-pulse"></span>
+      <span class="rp-title">RECOVERY TIMER</span>
+      <strong class="rp-clock" id="rpClock">01:30</strong>
+    </div>
+    <div class="rp-controls">
+      <button id="rpMinus" class="rp-btn">-15s</button>
+      <button id="rpPlus" class="rp-btn">+15s</button>
+      <button id="rpClose" class="rp-btn rp-dismiss">✕</button>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js").catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
