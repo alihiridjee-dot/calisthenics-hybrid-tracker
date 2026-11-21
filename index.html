@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=5" />
+  <link rel="stylesheet" href="styles.css?v=6" />
 </head>
 <body>
   <div class="app-shell">
@@ -106,14 +106,14 @@
       <!-- Minimal Session Note -->
       <div class="card note-card">
         <div class="note-head">
-          <span class="section-label">Session Note</span>
-          <span class="note-status" id="fnSaveStatus">Saved locally</span>
+          <span class="section-label">Note</span>
+          <span class="note-status" id="fnSaveStatus">Saved</span>
         </div>
         <input
           type="text"
           id="dailyNoteInput"
           class="note-input"
-          placeholder="How did top sets feel? Energy, sleep, or weight..."
+          placeholder="Add a note..."
         />
       </div>
     </section>
@@ -128,7 +128,7 @@
         <div class="bw-row">
           <div>
             <div class="card-title">Daily Targets</div>
-            <div class="card-sub" id="bmiSubText">6'0" (183 cm) · BMI 22.4</div>
+            <div class="card-sub" id="bmiSubText">6'0" · BMI 22.4</div>
           </div>
           <div class="stepper">
             <button id="bwMinus" class="step-btn" aria-label="Decrease weight">−</button>
@@ -142,7 +142,7 @@
             Recomp <span class="seg-hint">Maintenance</span>
           </button>
           <button class="seg-btn" data-goal="leanbulk" id="goalBulkBtn">
-            Lean Bulk <span class="seg-hint">+7.5% surplus</span>
+            Lean Bulk <span class="seg-hint">+7.5%</span>
           </button>
         </div>
 
@@ -152,10 +152,8 @@
 
       <!-- South Asian ~40g Protein Meal Builders -->
       <div class="card">
-        <div class="card-title">40g Protein Meal Builders</div>
-        <div class="card-sub" style="margin-bottom:12px;">
-          4 feedings of ~38–40g protein (~3g+ leucine each) to beat anabolic resistance and balance South Asian staple carbs.
-        </div>
+        <div class="card-title">40g Meal Ideas</div>
+        <div class="card-sub" style="margin-bottom:10px;">4 meals/day · ~3g+ leucine each</div>
         <div class="clean-list" id="mealIdeasGrid"></div>
       </div>
 
@@ -163,8 +161,8 @@
       <details class="card accordion-card">
         <summary class="acc-summary">
           <div>
-            <div class="card-title">Peer-Reviewed Evidence</div>
-            <div class="card-sub">8 studies behind your protein, volume &amp; recomp targets</div>
+            <div class="card-title">Research (8 Studies)</div>
+            <div class="card-sub">Protein, hypertrophy &amp; South Asian data</div>
           </div>
           <span class="acc-chevron">▾</span>
         </summary>
@@ -182,10 +180,10 @@
         <div class="card-title">Program Overview</div>
         <div class="card-sub" id="overviewSummary" style="margin-bottom:12px;"></div>
 
-        <div class="sub-heading">Weekly Split (Tap any day to open)</div>
+        <div class="sub-heading">Weekly Split</div>
         <div class="clean-list" id="weeklySplitList"></div>
 
-        <div class="sub-heading" style="margin-top:14px;">6 Mesocycles (21 Nov 2026 – 21 May 2027)</div>
+        <div class="sub-heading" style="margin-top:14px;">6 Phases (Nov 2026 – May 2027)</div>
         <div class="clean-list" id="mesoTimelineList"></div>
       </div>
 
@@ -193,20 +191,18 @@
       <div class="card">
         <div class="card-head-row">
           <div>
-            <div class="card-title">Bar Muscle-Up Pathway</div>
-            <div class="card-sub" id="muActiveLine">Tuesday fresh skill primer</div>
+            <div class="card-title">Bar Muscle-Up</div>
+            <div class="card-sub" id="muActiveLine">Tuesday drill</div>
           </div>
-          <span class="subtle-badge" id="muCurrentWeekBadge">Week 1</span>
+          <span class="subtle-badge" id="muCurrentWeekBadge">W1</span>
         </div>
         <div class="clean-list" id="muStagesStack" style="margin-top:12px;"></div>
       </div>
 
       <!-- Weekly Hypertrophy Volume Audit -->
       <div class="card">
-        <div class="card-title">Weekly Volume (Hard Sets)</div>
-        <div class="card-sub" style="margin-bottom:12px;">
-          Every muscle trained 2–3×/week inside the 10–17 set hypertrophy zone.
-        </div>
+        <div class="card-title">Weekly Volume</div>
+        <div class="card-sub" style="margin-bottom:10px;">Hard sets/week (target: 10–16)</div>
         <div class="vol-list" id="volumeAuditGrid"></div>
       </div>
 
@@ -214,8 +210,8 @@
       <details class="card accordion-card">
         <summary class="acc-summary">
           <div>
-            <div class="card-title">Coaching Frameworks Synthesized</div>
-            <div class="card-sub">Schoenfeld · Israetel · Helms · Nippard &amp; Wolf · Low &amp; Zlat · Schumann</div>
+            <div class="card-title">Sources &amp; Coaches</div>
+            <div class="card-sub">Schoenfeld · Israetel · Helms · Nippard · Low</div>
           </div>
           <span class="acc-chevron">▾</span>
         </summary>
@@ -226,12 +222,12 @@
       <div class="card">
         <div class="card-head-row" style="margin-bottom:12px;">
           <div>
-            <div class="card-title">26-Week Roadmap</div>
-            <div class="card-sub">21 Nov 2026 – 21 May 2027 · Tap any week</div>
+            <div class="card-title">26-Week Schedule</div>
+            <div class="card-sub">Tap a week to load</div>
           </div>
           <div class="util-actions">
             <button id="exportJsonBtn" class="mini-btn">Backup</button>
-            <button id="resetDayBtn" class="mini-btn danger">Clear day</button>
+            <button id="resetDayBtn" class="mini-btn danger">Clear</button>
           </div>
         </div>
         <div class="week-grid" id="weekMatrixGrid"></div>
@@ -253,8 +249,8 @@
     </div>
   </div>
 
-  <script src="data.js?v=5"></script>
-  <script src="app.js?v=5"></script>
+  <script src="data.js?v=6"></script>
+  <script src="app.js?v=6"></script>
   <script>
     if ("serviceWorker" in navigator) {
       let swRefreshing = false;
