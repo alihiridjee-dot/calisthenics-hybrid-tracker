@@ -13,6 +13,27 @@ const PLAN_DATA = {
     defaultGoalMode: "recomp"
   },
 
+  programOverview: {
+    summary: "5 training days (~60 min each) + 2 recovery days on a Sat–Fri cycle. Built to maximize muscle growth on a 6'0\", 75 kg frame while unlocking strict Bar Muscle-Ups and keeping waist fat tightly controlled.",
+    weeklySplit: [
+      { dayIndex: 0, day: "Sat", title: "Upper A · Heavy V-Taper", duration: "60m", targets: "Lats, chest, upper chest, mid-back, side delts, biceps & triceps" },
+      { dayIndex: 1, day: "Sun", title: "Lower A · Quads & Core", duration: "60m", targets: "Quads, glutes, stretched hamstrings, soleus calves & lower abs" },
+      { dayIndex: 2, day: "Mon", title: "Active Recovery", duration: "30m", targets: "Zone 2 incline walk (insulin sensitivity) + wrist/rotator prehab" },
+      { dayIndex: 3, day: "Tue", title: "Upper B · Muscle-Up & Stretch", duration: "60m", targets: "Fresh Bar Muscle-Up skill + lats, chest stretch, side delts & triceps" },
+      { dayIndex: 4, day: "Wed", title: "Lower B · Posterior & Core", duration: "58m", targets: "Hamstrings, glutes, gastroc calves, hollow-body core & quad flush" },
+      { dayIndex: 5, day: "Thu", title: "Upper C · Weak-Points + Run", duration: "60m", targets: "3rd weekly hit on upper chest, rear/side delts & arms + quality run" },
+      { dayIndex: 6, day: "Fri", title: "Full Rest", duration: "10m", targets: "Sleep, 152–160g protein & 5g creatine before Saturday progression" }
+    ],
+    mesocycles: [
+      { weeks: "W1–W5", dates: "21 Nov – 25 Dec", name: "Foundation & Technique", focus: "Groove form & RIR (2–3 → 1 RIR), build weighted pull/dip base (+5→10kg), explosive sternum pulls; W5 deload." },
+      { weeks: "W6–W9", dates: "26 Dec – 22 Jan", name: "Hypertrophy I", focus: "Ramp mechanical tension (2 → 0–1 RIR), pull +12.5kg / dip +12.5kg, C-curve & straight-bar dips, threshold runs; W9 deload." },
+      { weeks: "W10–W13", dates: "23 Jan – 19 Feb", name: "Hypertrophy II", focus: "Overload pull +15kg / dip +15kg + weighted volume pulls, band-assisted Bar Muscle-Ups + lengthened partials; W13 deload." },
+      { weeks: "W14–W17", dates: "20 Feb – 19 Mar", name: "Strength-Hypertrophy", focus: "Pull +17.5kg / dip +17.5kg, first unassisted Bar Muscle-Up singles in W16, 5K-pace intervals; W17 deload." },
+      { weeks: "W18–W21", dates: "20 Mar – 16 Apr", name: "Intensification", focus: "Heavy pull +20kg / dip +20kg, clean unassisted Muscle-Up doubles, high-output 800m repeats; W21 deload." },
+      { weeks: "W22–W26", dates: "17 Apr – 21 May", name: "Peak & Test", focus: "Peak loads (+22.5–25kg pull, +25–27.5kg dip), unbroken multi-rep Muscle-Ups (3–5+), W25 taper & W26 max test." }
+    ]
+  },
+
   expertFrameworks: [
     {
       name: "Dr. Brad Schoenfeld",

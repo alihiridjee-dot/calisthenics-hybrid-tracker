@@ -559,6 +559,40 @@ function renderPlanTab() {
   const weekObj = PLAN_DATA.weeks.find(w => w.week === state.currentWeek);
   const t = getNutritionTargets();
 
+  // Program Overview (Weekly Split + 6 Mesocycles)
+  const ov = PLAN_DATA.programOverview;
+  document.getElementById("overviewSummary").textContent = ov.summary;
+
+  const splitEl = document.getElementById("weeklySplitList");
+  splitEl.innerHTML = ov.weeklySplit.map(row => `
+    <button class="list-item split-row-btn" data-didx="${row.dayIndex}">
+      <div class="li-top">
+        <span class="li-title"><span class="split-day">${row.day}</span> ${row.title}</span>
+        <span class="li-meta">${row.duration}</span>
+      </div>
+      <div class="li-sub">${row.targets}</div>
+    </button>
+  `).join("");
+
+  splitEl.querySelectorAll(".split-row-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      state.currentDayIndex = parseInt(btn.dataset.didx, 10);
+      switchMode("workout");
+      saveState();
+      renderAll();
+    });
+  });
+
+  document.getElementById("mesoTimelineList").innerHTML = ov.mesocycles.map(m => `
+    <div class="list-item">
+      <div class="li-top">
+        <span class="li-title">${m.weeks} · ${m.name}</span>
+        <span class="li-meta">${m.dates}</span>
+      </div>
+      <div class="li-sub">${m.focus}</div>
+    </div>
+  `).join("");
+
   // Muscle-Up Pathway
   document.getElementById("muCurrentWeekBadge").textContent = `Week ${weekObj.week}`;
   document.getElementById("muActiveLine").textContent = `Tuesday drill: ${weekObj.muscleUpDrill}`;
