@@ -1,111 +1,85 @@
 // 26-Week Evidence-Based Hypertrophy, Muscle-Up & Protein Program
-// Starts Saturday, 21 November 2026 -> Friday, 21 May 2027 (60-Min High-SFR Sessions)
-// Synthesized from: Schoenfeld, Israetel (RP), Helms, Nippard & Wolf, Low & Zlat, Morton/Aragon/Phillips, Galpin/Schumann
+// Starts Saturday, 21 November 2026 -> Friday, 21 May 2027 (60-Min Sessions)
 
 const PLAN_DATA = {
   meta: {
     title: "26W Training",
-    subtitle: "60-Min Hypertrophy · Muscle-Up · Protein",
-    startDate: "2026-11-21", // Saturday, 21 Nov 2026
+    startDate: "2026-11-21",
     heightCm: 183,
-    heightLabel: "6'0\" (183 cm)",
+    heightLabel: "6'0\"",
     defaultBodyweightKg: 75,
     defaultGoalMode: "recomp"
   },
 
   programOverview: {
-    summary: "5 training days (~60 min each) + 2 recovery days on a Sat–Fri cycle. Built to maximize muscle growth on a 6'0\", 75 kg frame while unlocking strict Bar Muscle-Ups and keeping waist fat tightly controlled.",
+    summary: "5 workouts (~60 min) + 2 recovery days. Built for a 6'0\", 75 kg frame.",
     weeklySplit: [
-      { dayIndex: 0, day: "Sat", title: "Upper A · Heavy V-Taper", duration: "60m", targets: "Lats, chest, upper chest, mid-back, side delts, biceps & triceps" },
-      { dayIndex: 1, day: "Sun", title: "Lower A · Quads & Core", duration: "60m", targets: "Quads, glutes, stretched hamstrings, soleus calves & lower abs" },
-      { dayIndex: 2, day: "Mon", title: "Active Recovery", duration: "30m", targets: "Zone 2 incline walk (insulin sensitivity) + wrist/rotator prehab" },
-      { dayIndex: 3, day: "Tue", title: "Upper B · Muscle-Up & Stretch", duration: "60m", targets: "Fresh Bar Muscle-Up skill + lats, chest stretch, side delts & triceps" },
-      { dayIndex: 4, day: "Wed", title: "Lower B · Posterior & Core", duration: "58m", targets: "Hamstrings, glutes, gastroc calves, hollow-body core & quad flush" },
-      { dayIndex: 5, day: "Thu", title: "Upper C · Weak-Points + Run", duration: "60m", targets: "3rd weekly hit on upper chest, rear/side delts & arms + quality run" },
-      { dayIndex: 6, day: "Fri", title: "Full Rest", duration: "10m", targets: "Sleep, 152–160g protein & 5g creatine before Saturday progression" }
+      { dayIndex: 0, day: "Sat", title: "Upper A · Heavy", duration: "60m", targets: "Lats · Chest · Mid-Back · Side Delts · Arms" },
+      { dayIndex: 1, day: "Sun", title: "Lower A · Quads", duration: "60m", targets: "Quads · Glutes · Hamstrings · Calves · Abs" },
+      { dayIndex: 2, day: "Mon", title: "Active Recovery", duration: "30m", targets: "Zone 2 incline walk · Wrist & shoulder prehab" },
+      { dayIndex: 3, day: "Tue", title: "Upper B · Muscle-Up", duration: "60m", targets: "Bar Muscle-Up skill · Lats · Chest · Delts · Triceps" },
+      { dayIndex: 4, day: "Wed", title: "Lower B · Posterior", duration: "58m", targets: "Hamstrings · Glutes · Calves · Core · Lunges" },
+      { dayIndex: 5, day: "Thu", title: "Upper C · Frame + Run", duration: "60m", targets: "Upper Chest · Rear/Side Delts · Arms · Quality Run" },
+      { dayIndex: 6, day: "Fri", title: "Full Rest", duration: "Rest", targets: "Sleep 8h · Full protein · 5g creatine" }
     ],
     mesocycles: [
-      { weeks: "W1–W5", dates: "21 Nov – 25 Dec", name: "Foundation & Technique", focus: "Groove form & RIR (2–3 → 1 RIR), build weighted pull/dip base (+5→10kg), explosive sternum pulls; W5 deload." },
-      { weeks: "W6–W9", dates: "26 Dec – 22 Jan", name: "Hypertrophy I", focus: "Ramp mechanical tension (2 → 0–1 RIR), pull +12.5kg / dip +12.5kg, C-curve & straight-bar dips, threshold runs; W9 deload." },
-      { weeks: "W10–W13", dates: "23 Jan – 19 Feb", name: "Hypertrophy II", focus: "Overload pull +15kg / dip +15kg + weighted volume pulls, band-assisted Bar Muscle-Ups + lengthened partials; W13 deload." },
-      { weeks: "W14–W17", dates: "20 Feb – 19 Mar", name: "Strength-Hypertrophy", focus: "Pull +17.5kg / dip +17.5kg, first unassisted Bar Muscle-Up singles in W16, 5K-pace intervals; W17 deload." },
-      { weeks: "W18–W21", dates: "20 Mar – 16 Apr", name: "Intensification", focus: "Heavy pull +20kg / dip +20kg, clean unassisted Muscle-Up doubles, high-output 800m repeats; W21 deload." },
-      { weeks: "W22–W26", dates: "17 Apr – 21 May", name: "Peak & Test", focus: "Peak loads (+22.5–25kg pull, +25–27.5kg dip), unbroken multi-rep Muscle-Ups (3–5+), W25 taper & W26 max test." }
+      { weeks: "W1–5", dates: "21 Nov – 25 Dec", name: "Foundation", focus: "Pull +5→10 kg · Sternum pulls · W5 deload" },
+      { weeks: "W6–9", dates: "26 Dec – 22 Jan", name: "Hypertrophy I", focus: "Pull/Dip +12.5 kg · C-curve & bar dips · W9 deload" },
+      { weeks: "W10–13", dates: "23 Jan – 19 Feb", name: "Hypertrophy II", focus: "Pull/Dip +15 kg · Band Muscle-Ups · W13 deload" },
+      { weeks: "W14–17", dates: "20 Feb – 19 Mar", name: "Strength-Hyp", focus: "Pull/Dip +17.5 kg · 1st unassisted MU (W16) · W17 deload" },
+      { weeks: "W18–21", dates: "20 Mar – 16 Apr", name: "Intensify", focus: "Pull/Dip +20 kg · Unassisted MU doubles · W21 deload" },
+      { weeks: "W22–26", dates: "17 Apr – 21 May", name: "Peak & Test", focus: "Pull +25 / Dip +27.5 kg · 3–5+ MU · W25 taper" }
     ]
   },
 
   expertFrameworks: [
-    {
-      name: "Dr. Brad Schoenfeld",
-      role: "Hypertrophy Volume & Frequency",
-      detail: "10–17 hard working sets per muscle group per week across 2–3×/week frequency, with 2–3 min inter-set recovery (Schoenfeld et al., 2016, 2017)."
-    },
-    {
-      name: "Dr. Mike Israetel (RP Strength)",
-      role: "Mesocycle RIR Wave & High-SFR Selection",
-      detail: "Start each 4-week block near MEV (2–3 RIR), ramp to 0–1 RIR near MRV, then deload. Prioritize high Stimulus-to-Fatigue Ratio lifts (Hack Squat, Chest-Supported Row, Cables)."
-    },
-    {
-      name: "Dr. Eric Helms (3DMJ)",
-      role: "Double Progression & Lean Surplus",
-      detail: "Keep load fixed until you hit the top of the rep range across all sets at target RIR, then add +1.25–2.5 kg. Cap lean bulk surplus at +5–8% (0.25–0.38% BW/wk; Helms 2023)."
-    },
-    {
-      name: "Jeff Nippard & Dr. Milo Wolf",
-      role: "Stretch-Mediated Hypertrophy",
-      detail: "Prioritize exercises loaded in the stretched position (Seated Leg Curl, Overhead Tricep Ext, Incline Curl, Cable Lateral, Standing Calf) + 2–3 lengthened partials on final isolation sets (Wolf 2023; Maeo 2021, 2023)."
-    },
-    {
-      name: "Steven Low & Mathew Zlat",
-      role: "Weighted Calisthenics & Bar Muscle-Up",
-      detail: "Anchor upper-body mass with heavy Weighted Pull-Ups & Dips; practice explosive Bar Muscle-Up transitions 100% fresh on Tuesday; pair with rotator cuff & wrist prehab."
-    },
-    {
-      name: "Morton, Aragon, Phillips & Schumann",
-      role: "Protein Distribution & Hybrid Conditioning",
-      detail: "2.0–2.2 g/kg/day protein across 4 × ~40g meals (≥3g leucine/meal), 5g/day creatine, and cardio separated from heavy lifting to prevent interference (Schumann 2022)."
-    }
+    { name: "Dr. Brad Schoenfeld", role: "Volume & Frequency", detail: "10–17 hard sets/muscle/week across 2–3×/week with 2–3m rest." },
+    { name: "Dr. Mike Israetel (RP)", role: "RIR Waves & SFR", detail: "Ramp 2–3 RIR → 0–1 RIR → deload using high-SFR lifts." },
+    { name: "Dr. Eric Helms", role: "Progression & Surplus", detail: "Double progression logbook; cap lean bulk at +5–8% calories." },
+    { name: "Jeff Nippard & Dr. Milo Wolf", role: "Stretched Hypertrophy", detail: "Deep-stretch lifts + 2–3 lengthened partials on final isolation sets." },
+    { name: "Steven Low & Mathew Zlat", role: "Weighted Calisthenics", detail: "Heavy weighted pull-ups & dips + fresh Tuesday Muscle-Up skill." },
+    { name: "Morton, Aragon & Schumann", role: "Protein & Cardio", detail: "2.0–2.2 g/kg across 4 meals; cardio separated from heavy legs." }
   ],
 
   mealSlots: [
-    { id: 0, short: "M1", label: "Breakfast", timing: "Within 90m of waking" },
-    { id: 1, short: "M2", label: "Pre-Lift", timing: "90–120m before gym" },
-    { id: 2, short: "M3", label: "Post-Lift", timing: "Within 90m post-lift" },
-    { id: 3, short: "M4", label: "Dinner", timing: "2h before sleep" }
+    { id: 0, short: "M1", label: "Breakfast", timing: "Morning" },
+    { id: 1, short: "M2", label: "Pre-Lift", timing: "90m pre-gym" },
+    { id: 2, short: "M3", label: "Post-Lift", timing: "Post-gym" },
+    { id: 3, short: "M4", label: "Dinner", timing: "Evening" }
   ],
 
   southAsianMeals: [
     {
-      tag: "Non-Veg · ~42g P",
-      title: "Tandoori Chicken Breast + Rice or 2 Roti",
-      macros: "42g P · 55g C · 8g F · ~3.6g Leucine",
-      detail: "180g raw (135g cooked) marinated chicken breast grilled/air-fried + measured basmati rice or 2 phulkas + cucumber raita."
+      tag: "42g P",
+      title: "Tandoori Chicken + Rice or 2 Roti",
+      macros: "42g P · 55g C · 8g F",
+      detail: "180g raw chicken breast, measured basmati or 2 roti, raita."
     },
     {
-      tag: "Fast Bolus · ~40g P",
-      title: "Whey Isolate + 0% Greek Yogurt / Skyr",
-      macros: "40g P · 35g C · 3g F · ~4.2g Leucine",
-      detail: "1 scoop whey isolate (25g P) mixed into 150g 0% Greek yogurt/skyr (15g P) + banana or berries + 5g creatine."
+      tag: "40g P",
+      title: "Whey + 0% Greek Yogurt / Skyr",
+      macros: "40g P · 35g C · 3g F",
+      detail: "1 scoop whey isolate, 150g 0% skyr/yogurt, fruit, 5g creatine."
     },
     {
-      tag: "Eggetarian · ~40g P",
-      title: "Masala Egg Bhurji (3 Whole + 220g Whites)",
-      macros: "40g P · 25g C · 15g F · ~3.4g Leucine",
-      detail: "3 whole eggs (18g P) + 220g liquid egg whites (22g P) with onion, tomato, turmeric & chili + 1–2 sourdough slices or 1 roti."
+      tag: "40g P",
+      title: "Masala Egg Bhurji",
+      macros: "40g P · 25g C · 15g F",
+      detail: "3 whole eggs + 220g egg whites, 1–2 sourdough toast or 1 roti."
     },
     {
-      tag: "Veg · ~40g P",
-      title: "Low-Fat Paneer / Tofu + Dal + Whey/Skyr",
-      macros: "40g P · 38g C · 12g F · ~3.2g Leucine",
-      detail: "150g low-fat paneer or firm tofu (~25g P) + 1 bowl thick moong/masoor dal (~9g P) + half scoop whey or 100g skyr (~10g P)."
+      tag: "40g P",
+      title: "Paneer / Tofu + Dal + Whey",
+      macros: "40g P · 38g C · 12g F",
+      detail: "150g low-fat paneer or firm tofu, 1 bowl dal, ½ scoop whey."
     }
   ],
 
   weeklyVolumeAudit: [
-    { muscle: "Lats & Mid-Back", sets: "14 sets (+4 skill)", freq: "2–3×/wk", pct: 92 },
-    { muscle: "Chest (Upper + Mid)", sets: "14–17 sets", freq: "3×/wk", pct: 95 },
+    { muscle: "Back (Lats & Mid)", sets: "14 sets", freq: "2–3×/wk", pct: 92 },
+    { muscle: "Chest", sets: "14–17 sets", freq: "3×/wk", pct: 95 },
     { muscle: "Side & Rear Delts", sets: "13 sets (10 side)", freq: "3×/wk", pct: 90 },
-    { muscle: "Biceps & Triceps", sets: "6–9 direct (15+ tot)", freq: "3×/wk", pct: 88 },
+    { muscle: "Arms (Bi + Tri)", sets: "15+ total sets", freq: "3×/wk", pct: 88 },
     { muscle: "Quads", sets: "12–13 sets", freq: "2×/wk", pct: 90 },
     { muscle: "Hamstrings & Glutes", sets: "10–13 sets", freq: "2×/wk", pct: 88 },
     { muscle: "Calves & Core", sets: "8 calves · 6 core", freq: "2×/wk", pct: 85 }
@@ -113,572 +87,168 @@ const PLAN_DATA = {
 
   researchCitations: [
     {
-      study: "Morton et al. (2018) · British Journal of Sports Medicine",
-      finding: "Meta-analysis of 49 RCTs (n=1,863): lean mass gains plateau around 1.62 g/kg/day on average, with a 95% CI upper bound of 2.2 g/kg/day.",
-      application: "Sets your 120g floor (1.6 g/kg) and 152–160g daily target (2.0–2.13 g/kg) at 75 kg."
+      study: "Morton et al. (2018) · BJSM",
+      finding: "49 RCTs (n=1,863): muscle gains plateau at 1.62 g/kg/day (95% CI up to 2.2 g/kg).",
+      application: "120g daily floor · 152–160g target."
     },
     {
-      study: "Schoenfeld & Aragon (2018) · J. Int. Soc. Sports Nutrition",
-      finding: "Consuming 0.40–0.55 g/kg protein per meal across at least 4 meals maximizes daily muscle protein synthesis.",
-      application: "Drives your 4 × 38–40g meal bolus tracker on the Workout tab."
+      study: "Schoenfeld & Aragon (2018) · JISSN",
+      finding: "0.40–0.55 g/kg protein per meal across 4+ meals maximizes daily synthesis.",
+      application: "4 × 38–40g meal tracker."
     },
     {
-      study: "Jäger et al. (2017) · ISSN Position Stand on Protein",
-      finding: "Each feeding should deliver 20–40g high-quality protein with 2–3g leucine alongside complete EAAs every 3–4 hours.",
-      application: "Guides the South Asian meal blueprints to pair dal/rice with leucine-dense proteins."
+      study: "Jäger et al. (2017) · ISSN",
+      finding: "20–40g complete protein (2–3g leucine) per meal every 3–4h.",
+      application: "Leucine-dense South Asian meal swaps."
     },
     {
-      study: "Barakat et al. (2020) · Strength & Conditioning Journal",
-      finding: "Simultaneous muscle gain and fat loss (recomposition) is achievable with progressive overload + 2.0–2.6 g/kg protein.",
-      application: "Powers Recomp mode (maintenance calories + 2.13 g/kg protein) to address skinny-fat composition."
+      study: "Barakat et al. (2020) · SCJ",
+      finding: "Trained lifters can build muscle and lose fat together at 2.0–2.6 g/kg protein.",
+      application: "Recomp mode (maintenance + 2.13 g/kg)."
     },
     {
-      study: "Yajnik (2004); Lear et al. (2009); Misra & Khurana (2011); Iliodromiti et al. (2023)",
-      finding: "South Asians commonly carry lower skeletal muscle mass and higher visceral/ectopic fat at normal BMI, limiting muscle glucose disposal.",
-      application: "Prioritizes progressive hypertrophy (expanding your metabolic muscle sink) + post-meal walks and peri-workout carbs."
+      study: "Yajnik; Lear; Misra; Iliodromiti",
+      finding: "South Asians often carry less muscle and more visceral fat at normal BMI.",
+      application: "Hypertrophy focus + post-meal walks."
     },
     {
-      study: "Helms et al. (2023) · Sports Medicine - Open",
-      finding: "Small (~5%) vs large (~15%) surpluses produced similar hypertrophy; large surpluses mainly added body fat.",
-      application: "Caps Lean Bulk mode at +7.5% (+0.25–0.38% BW/wk) to protect waist circumference."
+      study: "Helms et al. (2023) · Sports Med",
+      finding: "Small (~5%) surpluses match large surpluses for muscle with far less fat gain.",
+      application: "Lean Bulk capped at +7.5% calories."
     },
     {
-      study: "Schoenfeld et al. (2016, 2017); Iversen et al. (2021) · Sports Medicine",
-      finding: "≥2×/wk frequency, 10–20 sets/muscle/wk, and 2–3 min rests maximize growth. Antagonist paired sets cut session time ~40% while keeping recovery high.",
-      application: "Structures all 60-minute sessions into A1/A2, B1/B2, and C1/C2 antagonist pairs."
+      study: "Schoenfeld (2016, 2017) · Iversen (2021)",
+      finding: "≥2×/wk frequency, 10–20 sets/wk, and antagonist pairs save ~40% time.",
+      application: "60-min A1/A2 paired sessions."
     },
     {
-      study: "Wolf et al. (2023); Maeo et al. (2021, 2023); Schumann et al. (2022); Kreider et al. (2017)",
-      finding: "Stretched-position lifts and lengthened partials enhance growth; separated cardio avoids power interference; 5g/day creatine increases lean mass.",
-      application: "Built into exercise selection (seated curl, overhead tricep, incline curl), Mon/Thu cardio split, and daily creatine."
+      study: "Wolf (2023) · Maeo (2021, 2023) · Schumann (2022) · Kreider (2017)",
+      finding: "Deep-stretch lifts grow more muscle; separated cardio avoids interference; 5g creatine works.",
+      application: "Stretched isolations · Mon/Thu cardio · 5g creatine."
     }
   ],
 
   muscleUpStages: [
-    {
-      stage: 1,
-      weeks: "Weeks 1–4",
-      title: "Explosive Sternum Pulls & False Grip",
-      target: "Pull bar to lower chest · 15s false-grip hangs",
-      cue: "Drive elbows violently down and back while leaning slightly back at the top—pull toward your sternum/belly, not your chin.",
-      drill: "4 × 3 explosive chest-to-bar pull-ups (Tuesday fresh)"
-    },
-    {
-      stage: 2,
-      weeks: "Weeks 5–9",
-      title: "C-Curve Arc & Straight-Bar Dips",
-      target: "Smooth around-the-bar arc + 4 × 6 straight-bar dips",
-      cue: "Start 30 cm behind the bar, glide into a slight hollow C-curve forward, then pull back and around the bar on the rebound.",
-      drill: "3 × 3 C-curve pop-pulls + 3 × 6 straight-bar dips"
-    },
-    {
-      stage: 3,
-      weeks: "Weeks 10–15",
-      title: "Band Muscle-Ups & Slow Negative Transitions",
-      target: "4 × 2 band-assisted bar muscle-ups + 4s negative transitions",
-      cue: "At peak pull height, snap your head and chest aggressively OVER the bar while rolling your wrists into top support.",
-      drill: "4 × 2 light/medium-band bar muscle-ups"
-    },
-    {
-      stage: 4,
-      weeks: "Weeks 16–21",
-      title: "First Unassisted Bar Muscle-Up Singles",
-      target: "4 × 1–2 strict unassisted bar muscle-ups",
-      cue: "With weighted pull-ups now at +17.5 to +20 kg, step up fresh at the start of Tuesday's session and hit crisp singles.",
-      drill: "4 × 1–2 unassisted bar muscle-ups (90s rest)"
-    },
-    {
-      stage: 5,
-      weeks: "Weeks 22–26",
-      title: "Multi-Rep Bar Muscle-Up Mastery",
-      target: "3 × 3–5 unbroken clean bar muscle-ups",
-      cue: "Control the drop from top support to load a smooth hollow rebound into the next repetition.",
-      drill: "3 × 3–5 unbroken bar muscle-ups"
-    }
+    { stage: 1, weeks: "W1–4", title: "Sternum Pulls & False Grip", target: "Pull bar to lower chest · 15s false grip" },
+    { stage: 2, weeks: "W5–9", title: "C-Curve & Straight-Bar Dips", target: "Arc around bar · 4 × 6 straight-bar dips" },
+    { stage: 3, weeks: "W10–15", title: "Band Muscle-Ups & Negatives", target: "4 × 2 band MU · 4s slow transitions" },
+    { stage: 4, weeks: "W16–21", title: "Unassisted Singles", target: "4 × 1–2 strict unassisted bar MU" },
+    { stage: 5, weeks: "W22–26", title: "Multi-Rep Mastery", target: "3 × 3–5 unbroken clean bar MU" }
   ],
 
   // 26 Weeks starting Saturday, 21 November 2026 -> Friday, 21 May 2027
   weeks: [
-    {
-      week: 1, startDate: "2026-11-21", phase: "Meso 1 · Foundation", blockType: "Accumulation", rirTarget: "2–3 RIR",
-      pullUpLoad: 5, pullUpScheme: "4 × 4", dipLoad: 0, dipScheme: "4 × 8",
-      volPullUps: "4 × 6 (BW)", muscleUpDrill: "Stage 1: 4 × 3 Explosive Sternum Pulls",
-      qualityRun: "15m Tempo @ 10K effort (1.5% inc)"
-    },
-    {
-      week: 2, startDate: "2026-11-28", phase: "Meso 1 · Foundation", blockType: "Accumulation", rirTarget: "2 RIR",
-      pullUpLoad: 7.5, pullUpScheme: "4 × 4", dipLoad: 5, dipScheme: "4 × 8",
-      volPullUps: "4 × 7 (BW)", muscleUpDrill: "Stage 1: 4 × 3 Explosive Sternum Pulls",
-      qualityRun: "15m Tempo @ 10K effort (1.5% inc)"
-    },
-    {
-      week: 3, startDate: "2026-12-05", phase: "Meso 1 · Foundation", blockType: "Accumulation", rirTarget: "1–2 RIR",
-      pullUpLoad: 10, pullUpScheme: "4 × 4", dipLoad: 7.5, dipScheme: "4 × 8",
-      volPullUps: "4 × 8 (BW)", muscleUpDrill: "Stage 1: 4 × 4 Explosive Sternum Pulls",
-      qualityRun: "18m Tempo @ 10K effort (1.5% inc)"
-    },
-    {
-      week: 4, startDate: "2026-12-12", phase: "Meso 1 · Foundation", blockType: "Overreach", rirTarget: "1 RIR",
-      pullUpLoad: 10, pullUpScheme: "4 × 5", dipLoad: 10, dipScheme: "4 × 8",
-      volPullUps: "4 × 9 (BW)", muscleUpDrill: "Stage 1: 4 × 4 High Belly-to-Bar Pulls",
-      qualityRun: "18m Tempo @ 10K effort (1.5% inc)"
-    },
-    {
-      week: 5, startDate: "2026-12-19", phase: "Meso 1 · Deload", blockType: "DELOAD", rirTarget: "3–4 RIR",
-      pullUpLoad: 7.5, pullUpScheme: "3 × 4", dipLoad: 5, dipScheme: "3 × 6",
-      volPullUps: "3 × 6 (BW)", muscleUpDrill: "Stage 2: 3 × 3 Light C-Curve Pop-Pulls",
-      qualityRun: "15m Easy Zone 2 Jog"
-    },
-    {
-      week: 6, startDate: "2026-12-26", phase: "Meso 2 · Hypertrophy I", blockType: "Accumulation", rirTarget: "2 RIR",
-      pullUpLoad: 10, pullUpScheme: "4 × 6", dipLoad: 12.5, dipScheme: "4 × 6",
-      volPullUps: "4 × 9 (BW)", muscleUpDrill: "Stage 2: 4 × 3 C-Curve + 5 Straight-Bar Dips",
-      qualityRun: "3 × 5m Threshold (90s jog)"
-    },
-    {
-      week: 7, startDate: "2027-01-02", phase: "Meso 2 · Hypertrophy I", blockType: "Accumulation", rirTarget: "1–2 RIR",
-      pullUpLoad: 12.5, pullUpScheme: "4 × 4", dipLoad: 12.5, dipScheme: "4 × 7",
-      volPullUps: "4 × 10 (BW)", muscleUpDrill: "Stage 2: 4 × 3 C-Curve + 6 Straight-Bar Dips",
-      qualityRun: "3 × 5m Threshold (90s jog)"
-    },
-    {
-      week: 8, startDate: "2027-01-09", phase: "Meso 2 · Hypertrophy I", blockType: "Overreach", rirTarget: "0–1 RIR",
-      pullUpLoad: 12.5, pullUpScheme: "4 × 5", dipLoad: 12.5, dipScheme: "4 × 8",
-      volPullUps: "4 × 10 (BW)", muscleUpDrill: "Stage 2: 4 × 4 C-Curve Hip-to-Bar Pulls",
-      qualityRun: "3 × 6m Threshold (90s jog)"
-    },
-    {
-      week: 9, startDate: "2027-01-16", phase: "Meso 2 · Deload", blockType: "DELOAD", rirTarget: "3–4 RIR",
-      pullUpLoad: 10, pullUpScheme: "3 × 4", dipLoad: 10, dipScheme: "3 × 6",
-      volPullUps: "3 × 7 (BW)", muscleUpDrill: "Stage 2: 3 × 2 Smooth Transition Drills",
-      qualityRun: "15m Easy Zone 2 Jog"
-    },
-    {
-      week: 10, startDate: "2027-01-23", phase: "Meso 3 · Hypertrophy II", blockType: "Accumulation", rirTarget: "2 RIR",
-      pullUpLoad: 12.5, pullUpScheme: "4 × 6", dipLoad: 15, dipScheme: "4 × 6",
-      volPullUps: "4 × 7 (+2.5kg)", muscleUpDrill: "Stage 3: 4 × 2 Band Bar Muscle-Ups",
-      qualityRun: "4 × 4m Threshold (90s jog)"
-    },
-    {
-      week: 11, startDate: "2027-01-30", phase: "Meso 3 · Hypertrophy II", blockType: "Accumulation", rirTarget: "1–2 RIR",
-      pullUpLoad: 15, pullUpScheme: "4 × 4", dipLoad: 15, dipScheme: "4 × 7",
-      volPullUps: "4 × 8 (+2.5kg)", muscleUpDrill: "Stage 3: 4 × 2 Band Bar Muscle-Ups",
-      qualityRun: "4 × 4m Threshold (90s jog)"
-    },
-    {
-      week: 12, startDate: "2027-02-06", phase: "Meso 3 · Hypertrophy II", blockType: "Overreach", rirTarget: "0–1 RIR",
-      pullUpLoad: 15, pullUpScheme: "4 × 5", dipLoad: 15, dipScheme: "4 × 8",
-      volPullUps: "4 × 9 (+2.5kg)", muscleUpDrill: "Stage 3: 4 × 3 Light-Band Muscle-Ups",
-      qualityRun: "18m Continuous Threshold"
-    },
-    {
-      week: 13, startDate: "2027-02-13", phase: "Meso 3 · Deload", blockType: "DELOAD", rirTarget: "3–4 RIR",
-      pullUpLoad: 11.25, pullUpScheme: "3 × 4", dipLoad: 11.25, dipScheme: "3 × 6",
-      volPullUps: "3 × 7 (BW)", muscleUpDrill: "Stage 3: 3 × 2 Light-Band Muscle-Ups",
-      qualityRun: "15m Easy Zone 2 Jog"
-    },
-    {
-      week: 14, startDate: "2027-02-20", phase: "Meso 4 · Strength-Hyp", blockType: "Accumulation", rirTarget: "2 RIR",
-      pullUpLoad: 15, pullUpScheme: "4 × 6", dipLoad: 17.5, dipScheme: "4 × 6",
-      volPullUps: "4 × 7 (+5kg)", muscleUpDrill: "Stage 3: 4 × 3 Thin-Band Muscle-Ups",
-      qualityRun: "4 × 3m @ 5K Pace (90s jog)"
-    },
-    {
-      week: 15, startDate: "2027-02-27", phase: "Meso 4 · Strength-Hyp", blockType: "Accumulation", rirTarget: "1–2 RIR",
-      pullUpLoad: 17.5, pullUpScheme: "4 × 4", dipLoad: 17.5, dipScheme: "4 × 7",
-      volPullUps: "4 × 8 (+5kg)", muscleUpDrill: "Stage 3: 4 × 3 Thin-Band + 4s Negatives",
-      qualityRun: "5 × 3m @ 5K Pace (90s jog)"
-    },
-    {
-      week: 16, startDate: "2027-03-06", phase: "Meso 4 · Strength-Hyp", blockType: "Overreach", rirTarget: "0–1 RIR",
-      pullUpLoad: 17.5, pullUpScheme: "4 × 5", dipLoad: 17.5, dipScheme: "4 × 8",
-      volPullUps: "4 × 9 (+5kg)", muscleUpDrill: "Stage 4: 4 × 1 Unassisted Muscle-Ups",
-      qualityRun: "5 × 3m @ 5K Pace (90s jog)"
-    },
-    {
-      week: 17, startDate: "2027-03-13", phase: "Meso 4 · Deload", blockType: "DELOAD", rirTarget: "3–4 RIR",
-      pullUpLoad: 12.5, pullUpScheme: "3 × 4", dipLoad: 12.5, dipScheme: "3 × 6",
-      volPullUps: "3 × 8 (BW)", muscleUpDrill: "Stage 4: 3 × 1 Crisp Muscle-Up Single",
-      qualityRun: "15m Easy Zone 2 Jog"
-    },
-    {
-      week: 18, startDate: "2027-03-20", phase: "Meso 5 · Intensify", blockType: "Accumulation", rirTarget: "2 RIR",
-      pullUpLoad: 17.5, pullUpScheme: "4 × 6", dipLoad: 20, dipScheme: "4 × 6",
-      volPullUps: "4 × 9 (+5kg)", muscleUpDrill: "Stage 4: 4 × 1–2 Unassisted Muscle-Ups",
-      qualityRun: "5 × 800m @ 5K Pace (90s jog)"
-    },
-    {
-      week: 19, startDate: "2027-03-27", phase: "Meso 5 · Intensify", blockType: "Accumulation", rirTarget: "1–2 RIR",
-      pullUpLoad: 20, pullUpScheme: "4 × 4", dipLoad: 20, dipScheme: "4 × 7",
-      volPullUps: "4 × 7 (+7.5kg)", muscleUpDrill: "Stage 4: 4 × 2 Unassisted Muscle-Ups",
-      qualityRun: "5 × 800m @ 5K Pace (90s jog)"
-    },
-    {
-      week: 20, startDate: "2027-04-03", phase: "Meso 5 · Intensify", blockType: "Overreach", rirTarget: "0–1 RIR",
-      pullUpLoad: 20, pullUpScheme: "4 × 5", dipLoad: 20, dipScheme: "4 × 8",
-      volPullUps: "4 × 8 (+7.5kg)", muscleUpDrill: "Stage 4: 4 × 2 Strict Unassisted MU",
-      qualityRun: "6 × 800m @ 5K Pace (90s jog)"
-    },
-    {
-      week: 21, startDate: "2027-04-10", phase: "Meso 5 · Deload", blockType: "DELOAD", rirTarget: "3–4 RIR",
-      pullUpLoad: 15, pullUpScheme: "3 × 4", dipLoad: 15, dipScheme: "3 × 6",
-      volPullUps: "3 × 8 (BW)", muscleUpDrill: "Stage 4: 3 × 1 Effortless MU Single",
-      qualityRun: "15m Easy Zone 2 Jog"
-    },
-    {
-      week: 22, startDate: "2027-04-17", phase: "Meso 6 · Peak", blockType: "Intensification", rirTarget: "1–2 RIR",
-      pullUpLoad: 20, pullUpScheme: "4 × 6", dipLoad: 22.5, dipScheme: "4 × 6",
-      volPullUps: "4 × 9 (+7.5kg)", muscleUpDrill: "Stage 5: 3 × 3 Unbroken Muscle-Ups",
-      qualityRun: "6 × 400m @ Fast 5K (60s rec)"
-    },
-    {
-      week: 23, startDate: "2027-04-24", phase: "Meso 6 · Peak", blockType: "Intensification", rirTarget: "1 RIR",
-      pullUpLoad: 22.5, pullUpScheme: "4 × 4", dipLoad: 22.5, dipScheme: "4 × 7",
-      volPullUps: "4 × 9 (+7.5kg)", muscleUpDrill: "Stage 5: 3 × 3–4 Unbroken Muscle-Ups",
-      qualityRun: "7 × 400m @ Fast 5K (60s rec)"
-    },
-    {
-      week: 24, startDate: "2027-05-01", phase: "Meso 6 · Peak", blockType: "Overreach", rirTarget: "0–1 RIR",
-      pullUpLoad: 22.5, pullUpScheme: "4 × 5", dipLoad: 25, dipScheme: "4 × 6",
-      volPullUps: "4 × 8 (+10kg)", muscleUpDrill: "Stage 5: 3 × 4 Unbroken Muscle-Ups",
-      qualityRun: "8 × 400m @ Fast 5K (60s rec)"
-    },
-    {
-      week: 25, startDate: "2027-05-08", phase: "Meso 6 · Taper", blockType: "Taper", rirTarget: "3 RIR",
-      pullUpLoad: 15, pullUpScheme: "3 × 4", dipLoad: 15, dipScheme: "3 × 6",
-      volPullUps: "3 × 8 (BW)", muscleUpDrill: "Stage 5: 2 × 2 Crisp Taper MU",
-      qualityRun: "15m Easy + 4×20s Strides"
-    },
-    {
-      week: 26, startDate: "2027-05-15", phase: "Meso 6 · Peak Test", blockType: "Peak Test", rirTarget: "Max Test",
-      pullUpLoad: 25, pullUpScheme: "Max @ +25kg", dipLoad: 27.5, dipScheme: "4 × 6 / Max",
-      volPullUps: "Max Strict BW (18+)", muscleUpDrill: "Stage 5 Test: Max Unbroken MU (5+)",
-      qualityRun: "5K or 3K Treadmill Time Trial"
-    }
+    { week: 1, startDate: "2026-11-21", phase: "Phase 1", blockType: "Base", rirTarget: "2–3 RIR", pullUpLoad: 5, pullUpScheme: "4 × 4", dipLoad: 0, dipScheme: "4 × 8", volPullUps: "4 × 6 BW", muscleUpDrill: "4 × 3 Sternum Pulls", qualityRun: "15m Tempo (1.5%)" },
+    { week: 2, startDate: "2026-11-28", phase: "Phase 1", blockType: "Base", rirTarget: "2 RIR", pullUpLoad: 7.5, pullUpScheme: "4 × 4", dipLoad: 5, dipScheme: "4 × 8", volPullUps: "4 × 7 BW", muscleUpDrill: "4 × 3 Sternum Pulls", qualityRun: "15m Tempo (1.5%)" },
+    { week: 3, startDate: "2026-12-05", phase: "Phase 1", blockType: "Build", rirTarget: "1–2 RIR", pullUpLoad: 10, pullUpScheme: "4 × 4", dipLoad: 7.5, dipScheme: "4 × 8", volPullUps: "4 × 8 BW", muscleUpDrill: "4 × 4 Sternum Pulls", qualityRun: "18m Tempo (1.5%)" },
+    { week: 4, startDate: "2026-12-12", phase: "Phase 1", blockType: "Push", rirTarget: "1 RIR", pullUpLoad: 10, pullUpScheme: "4 × 5", dipLoad: 10, dipScheme: "4 × 8", volPullUps: "4 × 9 BW", muscleUpDrill: "4 × 4 High Belly Pulls", qualityRun: "18m Tempo (1.5%)" },
+    { week: 5, startDate: "2026-12-19", phase: "Phase 1", blockType: "DELOAD", rirTarget: "3–4 RIR", pullUpLoad: 7.5, pullUpScheme: "3 × 4", dipLoad: 5, dipScheme: "3 × 6", volPullUps: "3 × 6 BW", muscleUpDrill: "3 × 3 Light C-Curve", qualityRun: "15m Easy Zone 2" },
+    { week: 6, startDate: "2026-12-26", phase: "Phase 2", blockType: "Build", rirTarget: "2 RIR", pullUpLoad: 10, pullUpScheme: "4 × 6", dipLoad: 12.5, dipScheme: "4 × 6", volPullUps: "4 × 9 BW", muscleUpDrill: "4 × 3 C-Curve + Bar Dips", qualityRun: "3 × 5m Threshold" },
+    { week: 7, startDate: "2027-01-02", phase: "Phase 2", blockType: "Build", rirTarget: "1–2 RIR", pullUpLoad: 12.5, pullUpScheme: "4 × 4", dipLoad: 12.5, dipScheme: "4 × 7", volPullUps: "4 × 10 BW", muscleUpDrill: "4 × 3 C-Curve + Bar Dips", qualityRun: "3 × 5m Threshold" },
+    { week: 8, startDate: "2027-01-09", phase: "Phase 2", blockType: "Push", rirTarget: "0–1 RIR", pullUpLoad: 12.5, pullUpScheme: "4 × 5", dipLoad: 12.5, dipScheme: "4 × 8", volPullUps: "4 × 10 BW", muscleUpDrill: "4 × 4 Hip-to-Bar Pulls", qualityRun: "3 × 6m Threshold" },
+    { week: 9, startDate: "2027-01-16", phase: "Phase 2", blockType: "DELOAD", rirTarget: "3–4 RIR", pullUpLoad: 10, pullUpScheme: "3 × 4", dipLoad: 10, dipScheme: "3 × 6", volPullUps: "3 × 7 BW", muscleUpDrill: "3 × 2 Smooth Transitions", qualityRun: "15m Easy Zone 2" },
+    { week: 10, startDate: "2027-01-23", phase: "Phase 3", blockType: "Build", rirTarget: "2 RIR", pullUpLoad: 12.5, pullUpScheme: "4 × 6", dipLoad: 15, dipScheme: "4 × 6", volPullUps: "4 × 7 +2.5kg", muscleUpDrill: "4 × 2 Band Muscle-Ups", qualityRun: "4 × 4m Threshold" },
+    { week: 11, startDate: "2027-01-30", phase: "Phase 3", blockType: "Build", rirTarget: "1–2 RIR", pullUpLoad: 15, pullUpScheme: "4 × 4", dipLoad: 15, dipScheme: "4 × 7", volPullUps: "4 × 8 +2.5kg", muscleUpDrill: "4 × 2 Band Muscle-Ups", qualityRun: "4 × 4m Threshold" },
+    { week: 12, startDate: "2027-02-06", phase: "Phase 3", blockType: "Push", rirTarget: "0–1 RIR", pullUpLoad: 15, pullUpScheme: "4 × 5", dipLoad: 15, dipScheme: "4 × 8", volPullUps: "4 × 9 +2.5kg", muscleUpDrill: "4 × 3 Light-Band MU", qualityRun: "18m Threshold" },
+    { week: 13, startDate: "2027-02-13", phase: "Phase 3", blockType: "DELOAD", rirTarget: "3–4 RIR", pullUpLoad: 11.25, pullUpScheme: "3 × 4", dipLoad: 11.25, dipScheme: "3 × 6", volPullUps: "3 × 7 BW", muscleUpDrill: "3 × 2 Light-Band MU", qualityRun: "15m Easy Zone 2" },
+    { week: 14, startDate: "2027-02-20", phase: "Phase 4", blockType: "Build", rirTarget: "2 RIR", pullUpLoad: 15, pullUpScheme: "4 × 6", dipLoad: 17.5, dipScheme: "4 × 6", volPullUps: "4 × 7 +5kg", muscleUpDrill: "4 × 3 Thin-Band MU", qualityRun: "4 × 3m @ 5K Pace" },
+    { week: 15, startDate: "2027-02-27", phase: "Phase 4", blockType: "Build", rirTarget: "1–2 RIR", pullUpLoad: 17.5, pullUpScheme: "4 × 4", dipLoad: 17.5, dipScheme: "4 × 7", volPullUps: "4 × 8 +5kg", muscleUpDrill: "4 × 3 Thin-Band + Neg", qualityRun: "5 × 3m @ 5K Pace" },
+    { week: 16, startDate: "2027-03-06", phase: "Phase 4", blockType: "Push", rirTarget: "0–1 RIR", pullUpLoad: 17.5, pullUpScheme: "4 × 5", dipLoad: 17.5, dipScheme: "4 × 8", volPullUps: "4 × 9 +5kg", muscleUpDrill: "4 × 1 Unassisted MU", qualityRun: "5 × 3m @ 5K Pace" },
+    { week: 17, startDate: "2027-03-13", phase: "Phase 4", blockType: "DELOAD", rirTarget: "3–4 RIR", pullUpLoad: 12.5, pullUpScheme: "3 × 4", dipLoad: 12.5, dipScheme: "3 × 6", volPullUps: "3 × 8 BW", muscleUpDrill: "3 × 1 Crisp MU Single", qualityRun: "15m Easy Zone 2" },
+    { week: 18, startDate: "2027-03-20", phase: "Phase 5", blockType: "Build", rirTarget: "2 RIR", pullUpLoad: 17.5, pullUpScheme: "4 × 6", dipLoad: 20, dipScheme: "4 × 6", volPullUps: "4 × 9 +5kg", muscleUpDrill: "4 × 1–2 Unassisted MU", qualityRun: "5 × 800m @ 5K" },
+    { week: 19, startDate: "2027-03-27", phase: "Phase 5", blockType: "Build", rirTarget: "1–2 RIR", pullUpLoad: 20, pullUpScheme: "4 × 4", dipLoad: 20, dipScheme: "4 × 7", volPullUps: "4 × 7 +7.5kg", muscleUpDrill: "4 × 2 Unassisted MU", qualityRun: "5 × 800m @ 5K" },
+    { week: 20, startDate: "2027-04-03", phase: "Phase 5", blockType: "Push", rirTarget: "0–1 RIR", pullUpLoad: 20, pullUpScheme: "4 × 5", dipLoad: 20, dipScheme: "4 × 8", volPullUps: "4 × 8 +7.5kg", muscleUpDrill: "4 × 2 Strict MU", qualityRun: "6 × 800m @ 5K" },
+    { week: 21, startDate: "2027-04-10", phase: "Phase 5", blockType: "DELOAD", rirTarget: "3–4 RIR", pullUpLoad: 15, pullUpScheme: "3 × 4", dipLoad: 15, dipScheme: "3 × 6", volPullUps: "3 × 8 BW", muscleUpDrill: "3 × 1 Easy MU Single", qualityRun: "15m Easy Zone 2" },
+    { week: 22, startDate: "2027-04-17", phase: "Phase 6", blockType: "Peak", rirTarget: "1–2 RIR", pullUpLoad: 20, pullUpScheme: "4 × 6", dipLoad: 22.5, dipScheme: "4 × 6", volPullUps: "4 × 9 +7.5kg", muscleUpDrill: "3 × 3 Unbroken MU", qualityRun: "6 × 400m Fast 5K" },
+    { week: 23, startDate: "2027-04-24", phase: "Phase 6", blockType: "Peak", rirTarget: "1 RIR", pullUpLoad: 22.5, pullUpScheme: "4 × 4", dipLoad: 22.5, dipScheme: "4 × 7", volPullUps: "4 × 9 +7.5kg", muscleUpDrill: "3 × 3–4 Unbroken MU", qualityRun: "7 × 400m Fast 5K" },
+    { week: 24, startDate: "2027-05-01", phase: "Phase 6", blockType: "Push", rirTarget: "0–1 RIR", pullUpLoad: 22.5, pullUpScheme: "4 × 5", dipLoad: 25, dipScheme: "4 × 6", volPullUps: "4 × 8 +10kg", muscleUpDrill: "3 × 4 Unbroken MU", qualityRun: "8 × 400m Fast 5K" },
+    { week: 25, startDate: "2027-05-08", phase: "Phase 6", blockType: "Taper", rirTarget: "3 RIR", pullUpLoad: 15, pullUpScheme: "3 × 4", dipLoad: 15, dipScheme: "3 × 6", volPullUps: "3 × 8 BW", muscleUpDrill: "2 × 2 Crisp MU", qualityRun: "15m Easy + 4×20s" },
+    { week: 26, startDate: "2027-05-15", phase: "Phase 6", blockType: "Test", rirTarget: "Max Test", pullUpLoad: 25, pullUpScheme: "Max @ +25kg", dipLoad: 27.5, dipScheme: "4 × 6 / Max", volPullUps: "Max BW (18+)", muscleUpDrill: "Max Unbroken MU (5+)", qualityRun: "5K / 3K Time Trial" }
   ],
 
   // 7-Day Sat -> Fri Microcycle (Starts Saturday, 21 Nov 2026)
   daysTemplate: [
     {
-      dayIndex: 0,
-      dayName: "Saturday",
-      shortName: "SAT",
-      letter: "S",
-      sessionTitle: "Upper A · Heavy V-Taper",
-      sessionType: "strength",
-      estimatedMinutes: 60,
-      summary: "Antagonist pull/push pairs (~3m recovery per muscle) + side delts & arms.",
+      dayIndex: 0, dayName: "Saturday", shortName: "SAT", letter: "S",
+      sessionTitle: "Upper A · Heavy", sessionType: "strength", estimatedMinutes: 60,
+      summary: "Lats · Chest · Mid-Back · Side Delts · Arms",
       exercises: [
-        {
-          id: "sat-1", pair: "A1", name: "Weighted Pull-Ups", defaultSets: 4, reps: "4–6", restSeconds: 90,
-          dynamicKey: "upperA_pullup", loggable: true,
-          muscles: "Lats, Teres Major, Brachialis",
-          cues: "Full dead hang to sternum/throat; 2s controlled lowering. Alternate with A2 Dips (90s rest between).",
-          avoid: "Half-repping the bottom stretch or rushing rest under 75s."
-        },
-        {
-          id: "sat-2", pair: "A2", name: "Weighted Parallel Bar Dips", defaultSets: 4, reps: "6–8", restSeconds: 90,
-          dynamicKey: "upperA_dip", loggable: true,
-          muscles: "Chest, Front Delts, Triceps",
-          cues: "30° forward torso lean; 2–3s controlled descent to parallel or slightly below; crisp lockout.",
-          avoid: "Shrugging shoulders up or bouncing out of the bottom stretch."
-        },
-        {
-          id: "sat-3", pair: "B1", name: "30° Incline Dumbbell Press", defaultSets: 3, reps: "8–10", restSeconds: 75,
-          loggable: true, lengthened: true,
-          muscles: "Upper Chest (Clavicular), Front Delts",
-          cues: "Low 30° bench, elbows ~45°. Pause 1 full second in the deep bottom stretch on every rep.",
-          avoid: "Steep 45–60° incline that shifts tension to front delts."
-        },
-        {
-          id: "sat-4", pair: "B2", name: "Chest-Supported Row", defaultSets: 3, reps: "8–10", restSeconds: 75,
-          loggable: true, lengthened: true,
-          muscles: "Mid-Back, Rhomboids, Traps, Lats",
-          cues: "High-SFR mid-back builder. Protract shoulders fully at bottom stretch, pull elbows back with 1s squeeze.",
-          avoid: "Lifting chest off pad or heaving with lower-back momentum."
-        },
-        {
-          id: "sat-5", pair: "C1", name: "Cable Lateral Raise", defaultSets: 3, reps: "12–15", restSeconds: 60,
-          loggable: true, lengthened: true,
-          muscles: "Lateral Deltoids (Shoulder Width)",
-          cues: "Pulley at wrist height for peak tension in the stretched bottom. Sweep out wide without shrugging traps.",
-          avoid: "Swinging torso or lifting above shoulder height."
-        },
-        {
-          id: "sat-6", pair: "C2", name: "45° Incline Dumbbell Curl", defaultSets: 3, reps: "10–12", restSeconds: 60,
-          loggable: true, lengthened: true,
-          muscles: "Biceps (Stretched Long Head)",
-          cues: "Elbows pinned behind torso; lower to full straight-arm stretch. Add 2–3 lengthened partials on final set.",
-          avoid: "Drifting elbows forward on the way up."
-        },
-        {
-          id: "sat-7", pair: "D", name: "Overhead Cable Tricep Extension", defaultSets: 3, reps: "10–12", restSeconds: 75,
-          loggable: true, lengthened: true,
-          muscles: "Triceps Long Head",
-          cues: "Maeo et al. (2023): overhead stretch drives ~40% more long-head growth. Deep controlled stretch behind head.",
-          avoid: "Cutting bottom range of motion short."
-        }
+        { id: "sat-1", pair: "A1", name: "Weighted Pull-Ups", defaultSets: 4, reps: "4–6", restSeconds: 90, dynamicKey: "upperA_pullup", loggable: true, muscles: "Lats · Brachialis", cues: "Full dead hang to sternum; 2s lower. Alternate with A2.", avoid: "Half reps at bottom." },
+        { id: "sat-2", pair: "A2", name: "Weighted Parallel Bar Dips", defaultSets: 4, reps: "6–8", restSeconds: 90, dynamicKey: "upperA_dip", loggable: true, muscles: "Chest · Triceps", cues: "30° forward lean; 2–3s lower to parallel.", avoid: "Shrugging shoulders up." },
+        { id: "sat-3", pair: "B1", name: "30° Incline DB Press", defaultSets: 3, reps: "8–10", restSeconds: 75, loggable: true, lengthened: true, muscles: "Upper Chest", cues: "Low 30° bench; 1s pause in bottom stretch.", avoid: "Steep 45–60° bench." },
+        { id: "sat-4", pair: "B2", name: "Chest-Supported Row", defaultSets: 3, reps: "8–10", restSeconds: 75, loggable: true, lengthened: true, muscles: "Mid-Back · Lats", cues: "Stretch forward at bottom; 1s squeeze at top.", avoid: "Lifting chest off pad." },
+        { id: "sat-5", pair: "C1", name: "Cable Lateral Raise", defaultSets: 3, reps: "12–15", restSeconds: 60, loggable: true, lengthened: true, muscles: "Side Delts", cues: "Pulley at wrist height; sweep wide to shoulder level.", avoid: "Swinging or shrugging." },
+        { id: "sat-6", pair: "C2", name: "45° Incline DB Curl", defaultSets: 3, reps: "10–12", restSeconds: 60, loggable: true, lengthened: true, muscles: "Biceps", cues: "Keep elbows behind torso; full stretch at bottom.", avoid: "Drifting elbows forward." },
+        { id: "sat-7", pair: "D", name: "Overhead Tricep Extension", defaultSets: 3, reps: "10–12", restSeconds: 75, loggable: true, lengthened: true, muscles: "Triceps Long Head", cues: "Full stretch behind head; smooth lockout.", avoid: "Cutting bottom stretch." }
       ]
     },
     {
-      dayIndex: 1,
-      dayName: "Sunday",
-      shortName: "SUN",
-      letter: "S",
-      sessionTitle: "Lower A · Quads, Glutes & Core",
-      sessionType: "lower",
-      estimatedMinutes: 60,
-      summary: "High-SFR quad hypertrophy for long 6'0\" femurs, stretched hamstrings & abs.",
+      dayIndex: 1, dayName: "Sunday", shortName: "SUN", letter: "S",
+      sessionTitle: "Lower A · Quads", sessionType: "lower", estimatedMinutes: 60,
+      summary: "Quads · Glutes · Hamstrings · Calves · Abs",
       exercises: [
-        {
-          id: "sun-1", pair: "1", name: "Hack Squat or Heel-Elevated Squat", defaultSets: 4, reps: "6–8", restSeconds: 150,
-          loggable: true,
-          muscles: "Quads, Glutes, Adductors",
-          cues: "2–3s descent to full knee flexion (hamstrings on calves). Full 2.5 min rest for maximum tension.",
-          avoid: "Stopping above parallel or bouncing out of the hole."
-        },
-        {
-          id: "sun-2", pair: "A1", name: "DB Bulgarian Split Squat", defaultSets: 3, reps: "8–10 / leg", restSeconds: 60,
-          loggable: true,
-          muscles: "Quads, Glutes, Hip Stabilizers",
-          cues: "Slight forward lean; lower back knee toward pad/floor; keep 90% of load on front mid-foot.",
-          avoid: "Pushing off the rear foot."
-        },
-        {
-          id: "sun-3", pair: "A2", name: "Seated Calf Raise", defaultSets: 4, reps: "12–15", restSeconds: 60,
-          loggable: true, lengthened: true,
-          muscles: "Soleus",
-          cues: "Mandatory 2-second dead pause in the deep bottom stretch on every rep. Add 3 lengthened partials on set 4.",
-          avoid: "Bouncing rapidly off the Achilles tendon."
-        },
-        {
-          id: "sun-4", pair: "B1", name: "Seated Leg Extension", defaultSets: 3, reps: "12–15", restSeconds: 60,
-          loggable: true, lengthened: true,
-          muscles: "Rectus Femoris & VMO",
-          cues: "Pull hips into seat, extend fully with 1s squeeze, 2–3s controlled lowering.",
-          avoid: "Swinging weight stack or lifting hips off pad."
-        },
-        {
-          id: "sun-5", pair: "B2", name: "Seated Leg Curl", defaultSets: 3, reps: "10–12", restSeconds: 60,
-          loggable: true, lengthened: true,
-          muscles: "Hamstrings (Long Length)",
-          cues: "Maeo et al. (2021): seated hip flexion yields superior hamstring growth. Lock thigh pad tight; lean slightly forward.",
-          avoid: "Slamming weight stack between reps."
-        },
-        {
-          id: "sun-6", pair: "C", name: "Strict Hanging Leg Raise", defaultSets: 3, reps: "10–15", restSeconds: 60,
-          loggable: false,
-          muscles: "Rectus Abdominis, Lower Abs",
-          cues: "Press lightly down on bar to stop swing; curl tailbone upward at the top so pelvis flexes.",
-          avoid: "Swinging legs with a flat lower back."
-        }
+        { id: "sun-1", pair: "1", name: "Hack or Heel-Elevated Squat", defaultSets: 4, reps: "6–8", restSeconds: 150, loggable: true, muscles: "Quads · Glutes", cues: "2–3s descent to full depth; drive up strong.", avoid: "Stopping above parallel." },
+        { id: "sun-2", pair: "A1", name: "DB Bulgarian Split Squat", defaultSets: 3, reps: "8–10 / leg", restSeconds: 60, loggable: true, muscles: "Quads · Glutes", cues: "Slight forward lean; rear knee lightly kisses pad.", avoid: "Pushing off back foot." },
+        { id: "sun-3", pair: "A2", name: "Seated Calf Raise", defaultSets: 4, reps: "12–15", restSeconds: 60, loggable: true, lengthened: true, muscles: "Soleus Calves", cues: "2s dead pause at bottom stretch; 1s squeeze at top.", avoid: "Bouncing at bottom." },
+        { id: "sun-4", pair: "B1", name: "Seated Leg Extension", defaultSets: 3, reps: "12–15", restSeconds: 60, loggable: true, lengthened: true, muscles: "Front Quads", cues: "Pull hips into seat; 1s top lock, 2s lower.", avoid: "Swinging stack." },
+        { id: "sun-5", pair: "B2", name: "Seated Leg Curl", defaultSets: 3, reps: "10–12", restSeconds: 60, loggable: true, lengthened: true, muscles: "Hamstrings", cues: "Lock thigh pad tight; lean slightly forward.", avoid: "Slamming weight stack." },
+        { id: "sun-6", pair: "C", name: "Hanging Leg Raise", defaultSets: 3, reps: "10–15", restSeconds: 60, loggable: false, muscles: "Lower Abs", cues: "Curl pelvis upward at top; zero body swing.", avoid: "Swinging with flat back." }
       ]
     },
     {
-      dayIndex: 2,
-      dayName: "Monday",
-      shortName: "MON",
-      letter: "M",
-      sessionTitle: "Active Recovery & Zone 2",
-      sessionType: "rest",
-      estimatedMinutes: 30,
-      summary: "Low-impact Zone 2 walk for insulin sensitivity + Muscle-Up wrist prehab.",
+      dayIndex: 2, dayName: "Monday", shortName: "MON", letter: "M",
+      sessionTitle: "Active Recovery", sessionType: "rest", estimatedMinutes: 30,
+      summary: "Zone 2 Walk · Wrist & Shoulder Prehab",
       exercises: [
-        {
-          id: "mon-1", pair: "1", name: "Zone 2 Incline Walk", defaultSets: 1, reps: "25 min", restSeconds: 0,
-          loggable: false,
-          muscles: "GLUT4 Glucose Disposal, Aerobic Base",
-          cues: "8–10% incline @ 4.8–5.5 km/h (115–130 bpm) or brisk post-dinner walk. Zero leg interference. Hit full protein today.",
-          avoid: "Cutting protein on rest days—muscle synthesis stays elevated 24–48h post-lifting."
-        },
-        {
-          id: "mon-2", pair: "2", name: "False-Grip Wrist & Shoulder Prehab", defaultSets: 2, reps: "15 slow reps", restSeconds: 45,
-          loggable: false,
-          muscles: "Wrist Flexors, Pronator Teres, Rotator Cuff",
-          cues: "Light 2–3 kg forearm pronation/supination curls + 30s gentle wrist stretch + 10 band shoulder dislocates.",
-          avoid: "Skipping forearm prep before Tuesday's explosive bar work."
-        }
+        { id: "mon-1", pair: "1", name: "Zone 2 Incline Walk", defaultSets: 1, reps: "25 min", restSeconds: 0, loggable: false, muscles: "Cardio · Insulin", cues: "8–10% incline @ easy pace (115–130 bpm). Hit full protein.", avoid: "Skipping protein on rest days." },
+        { id: "mon-2", pair: "2", name: "Wrist & Shoulder Prehab", defaultSets: 2, reps: "15 reps", restSeconds: 45, loggable: false, muscles: "Forearms · Shoulders", cues: "Light pronation curls + 30s wrist stretch + band dislocates.", avoid: "Skipping prep before Tuesday." }
       ]
     },
     {
-      dayIndex: 3,
-      dayName: "Tuesday",
-      shortName: "TUE",
-      letter: "T",
-      sessionTitle: "Upper B · Muscle-Up & Stretch",
-      sessionType: "strength",
-      estimatedMinutes: 60,
-      summary: "Fresh Muscle-Up skill primer + volume pull/dip pairs + stretched-position isolation.",
+      dayIndex: 3, dayName: "Tuesday", shortName: "TUE", letter: "T",
+      sessionTitle: "Upper B · Muscle-Up", sessionType: "strength", estimatedMinutes: 60,
+      summary: "Bar Muscle-Up Skill · Lats · Chest · Delts · Triceps",
       exercises: [
-        {
-          id: "tue-mu", pair: "0", name: "Bar Muscle-Up Progression (Fresh)", defaultSets: 4, reps: "1–4 explosive", restSeconds: 90,
-          dynamicKey: "thu_muscleup", loggable: false, isSkill: true,
-          muscles: "Explosive Lats, Transition, Hollow Core",
-          cues: "Always done FIRST while 100% fresh. Arc around the bar in a C-curve and snap chest over the bar.",
-          avoid: "Pulling vertically straight into the steel bar."
-        },
-        {
-          id: "tue-1", pair: "A1", name: "Volume Pull-Ups", defaultSets: 4, reps: "6–10", restSeconds: 75,
-          dynamicKey: "upperB_volPullup", loggable: true,
-          muscles: "Lats, Teres Major, Biceps",
-          cues: "Crisp explosive pull, 2s controlled lowering to dead hang. Alternate with A2 Tempo Dips.",
-          avoid: "Grinding to failure on Set 1 and losing reps later."
-        },
-        {
-          id: "tue-2", pair: "A2", name: "Tempo Parallel / Straight-Bar Dips", defaultSets: 4, reps: "8–12", restSeconds: 75,
-          loggable: true,
-          muscles: "Pecs, Front Delts, Triceps",
-          cues: "3s lowering, 1s bottom pause, explosive press. Do 1–2 sets on a straight bar to reinforce Muscle-Up lockout.",
-          avoid: "Rushing the 3-second lowering phase."
-        },
-        {
-          id: "tue-3", pair: "B1", name: "Seated Cable Fly / Pec Deck", defaultSets: 3, reps: "10–12", restSeconds: 60,
-          loggable: true, lengthened: true,
-          muscles: "Pectoralis Major (Deep Stretch)",
-          cues: "Direct pec load without tricep fatigue. Slow 3s open into deep stretch; 2–3 lengthened partials on final set.",
-          avoid: "Bending elbows 90° and turning it into a press."
-        },
-        {
-          id: "tue-4", pair: "B2", name: "Single-Arm Cable Row", defaultSets: 3, reps: "10–12 / side", restSeconds: 60,
-          loggable: true, lengthened: true,
-          muscles: "Lower Lats, Mid-Back",
-          cues: "Reach slightly forward for full lat stretch, then drive elbow tucked tightly toward your hip pocket.",
-          avoid: "Twisting your torso to yank the handle."
-        },
-        {
-          id: "tue-5", pair: "C1", name: "Cable Lateral Raise", defaultSets: 3, reps: "12–15", restSeconds: 60,
-          loggable: true, lengthened: true,
-          muscles: "Lateral Deltoids",
-          cues: "Cable at wrist height running across thighs; control the 2–3s descent all the way into the bottom stretch.",
-          avoid: "Using body momentum."
-        },
-        {
-          id: "tue-6", pair: "C2", name: "Overhead Rope Tricep Extension", defaultSets: 3, reps: "10–12", restSeconds: 60,
-          loggable: true, lengthened: true,
-          muscles: "Triceps Long Head",
-          cues: "Second weekly stretched-position hit on long head; full stretch behind head on every rep.",
-          avoid: "Flaring elbows excessively or cutting depth."
-        }
+        { id: "tue-mu", pair: "0", name: "Bar Muscle-Up Skill (Fresh)", defaultSets: 4, reps: "1–4 reps", restSeconds: 90, dynamicKey: "thu_muscleup", loggable: false, isSkill: true, muscles: "Explosive Lats · Transition", cues: "Do FIRST while fresh. Hollow C-arc around bar, snap chest over.", avoid: "Pulling straight up into bar." },
+        { id: "tue-1", pair: "A1", name: "Volume Pull-Ups", defaultSets: 4, reps: "6–10", restSeconds: 75, dynamicKey: "upperB_volPullup", loggable: true, muscles: "Lats · Biceps", cues: "Fast pull, 2s lower to full dead hang.", avoid: "Failing on set 1." },
+        { id: "tue-2", pair: "A2", name: "Tempo / Straight-Bar Dips", defaultSets: 4, reps: "8–12", restSeconds: 75, loggable: true, muscles: "Chest · Triceps", cues: "3s lower, 1s pause, fast press. 1–2 sets on straight bar.", avoid: "Rushing descent." },
+        { id: "tue-3", pair: "B1", name: "Cable Fly / Pec Deck", defaultSets: 3, reps: "10–12", restSeconds: 60, loggable: true, lengthened: true, muscles: "Chest Stretch", cues: "Wide hug arc; slow 3s open into deep stretch.", avoid: "Bending elbows 90°." },
+        { id: "tue-4", pair: "B2", name: "Single-Arm Cable Row", defaultSets: 3, reps: "10–12 / side", restSeconds: 60, loggable: true, lengthened: true, muscles: "Lower Lats", cues: "Full reach forward; pull elbow tightly to hip pocket.", avoid: "Twisting torso." },
+        { id: "tue-5", pair: "C1", name: "Cable Lateral Raise", defaultSets: 3, reps: "12–15", restSeconds: 60, loggable: true, lengthened: true, muscles: "Side Delts", cues: "Wrist-height pulley; control slow descent across body.", avoid: "Using momentum." },
+        { id: "tue-6", pair: "C2", name: "Overhead Rope Extension", defaultSets: 3, reps: "10–12", restSeconds: 60, loggable: true, lengthened: true, muscles: "Triceps Long Head", cues: "Deep stretch behind head; smooth lockout.", avoid: "Flaring elbows wide." }
       ]
     },
     {
-      dayIndex: 4,
-      dayName: "Wednesday",
-      shortName: "WED",
-      letter: "W",
-      sessionTitle: "Lower B · Posterior & Core",
-      sessionType: "lower",
-      estimatedMinutes: 58,
-      summary: "Heavy hinge, long-length hamstrings, straight-knee calves & hollow core.",
+      dayIndex: 4, dayName: "Wednesday", shortName: "WED", letter: "W",
+      sessionTitle: "Lower B · Posterior", sessionType: "lower", estimatedMinutes: 58,
+      summary: "Hamstrings · Glutes · Calves · Core · Lunges",
       exercises: [
-        {
-          id: "wed-1", pair: "1", name: "Romanian Deadlift (with Straps)", defaultSets: 4, reps: "8–10", restSeconds: 150,
-          loggable: true,
-          muscles: "Hamstrings, Glutes, Erectors",
-          cues: "Use straps so grip never limits load. Lock 15° knee bend, push hips straight back, stop mid-shin at max stretch.",
-          avoid: "Rounding lower back to chase extra depth."
-        },
-        {
-          id: "wed-2", pair: "A1", name: "Seated Leg Curl", defaultSets: 3, reps: "10–12", restSeconds: 60,
-          loggable: true, lengthened: true,
-          muscles: "Hamstrings",
-          cues: "Lean slightly forward over pad; 1s squeeze under seat, 2–3s controlled return.",
-          avoid: "Slamming weight stack."
-        },
-        {
-          id: "wed-3", pair: "A2", name: "Standing Calf Raise", defaultSets: 4, reps: "10–12", restSeconds: 60,
-          loggable: true, lengthened: true,
-          muscles: "Gastrocnemius",
-          cues: "Straight knees (unlocked); mandatory 2s dead stretch at bottom, 1s squeeze at top. Lengthened partials on set 4.",
-          avoid: "Bending knees or bouncing out of the bottom."
-        },
-        {
-          id: "wed-4", pair: "B1", name: "Hip Thrust or High-Foot Leg Press", defaultSets: 3, reps: "10–12", restSeconds: 60,
-          loggable: true,
-          muscles: "Gluteus Maximus, Adductors",
-          cues: "Chin tucked, ribs down, full hip lockout with 1s glute squeeze.",
-          avoid: "Hyperextending lower back at the top."
-        },
-        {
-          id: "wed-5", pair: "B2", name: "Ab Wheel Rollout", defaultSets: 3, reps: "10–12", restSeconds: 60,
-          loggable: false,
-          muscles: "Core (Anti-Extension), Lats",
-          cues: "Tuck pelvis under (hollow body), roll out as far as control allows without lower-back sag.",
-          avoid: "Letting hips sag toward the floor."
-        },
-        {
-          id: "wed-6", pair: "C", name: "DB Walking Lunges", defaultSets: 2, reps: "12 / leg", restSeconds: 75,
-          loggable: true,
-          muscles: "Quads, Glutes",
-          cues: "Crisp 2×/week quad frequency finisher without wrecking legs before Thursday's run.",
-          avoid: "Crashing rear knee onto floor."
-        }
+        { id: "wed-1", pair: "1", name: "Romanian Deadlift (Straps)", defaultSets: 4, reps: "8–10", restSeconds: 150, loggable: true, muscles: "Hamstrings · Glutes", cues: "Soft 15° knees; push hips straight back to mid-shin stretch.", avoid: "Rounding lower back." },
+        { id: "wed-2", pair: "A1", name: "Seated Leg Curl", defaultSets: 3, reps: "10–12", restSeconds: 60, loggable: true, lengthened: true, muscles: "Hamstrings", cues: "Lean slightly forward; 1s squeeze, 2s return.", avoid: "Slamming stack." },
+        { id: "wed-3", pair: "A2", name: "Standing Calf Raise", defaultSets: 4, reps: "10–12", restSeconds: 60, loggable: true, lengthened: true, muscles: "Upper Calves", cues: "Straight knees; 2s dead bottom pause, 1s top squeeze.", avoid: "Bending knees or bouncing." },
+        { id: "wed-4", pair: "B1", name: "Hip Thrust or Leg Press", defaultSets: 3, reps: "10–12", restSeconds: 60, loggable: true, muscles: "Glutes · Adductors", cues: "Chin tucked, ribs down; 1s squeeze at top.", avoid: "Overarching lower back." },
+        { id: "wed-5", pair: "B2", name: "Ab Wheel Rollout", defaultSets: 3, reps: "10–12", restSeconds: 60, loggable: false, muscles: "Hollow Core", cues: "Tuck pelvis under; roll out with zero back sag.", avoid: "Letting hips drop." },
+        { id: "wed-6", pair: "C", name: "DB Walking Lunges", defaultSets: 2, reps: "12 / leg", restSeconds: 75, loggable: true, muscles: "Quads · Glutes", cues: "Controlled strides; rear knee lightly touches floor.", avoid: "Crashing knee down." }
       ]
     },
     {
-      dayIndex: 5,
-      dayName: "Thursday",
-      shortName: "THU",
-      letter: "T",
-      sessionTitle: "Upper C · Weak-Points + Run",
-      sessionType: "strength-run",
-      estimatedMinutes: 60,
-      summary: "3rd weekly hit for upper chest, side/rear delts & arms + 26W quality run.",
+      dayIndex: 5, dayName: "Thursday", shortName: "THU", letter: "T",
+      sessionTitle: "Upper C · Frame + Run", sessionType: "strength-run", estimatedMinutes: 60,
+      summary: "Upper Chest · Delts · Arms · Quality Run",
       exercises: [
-        {
-          id: "thu-1", pair: "A1", name: "Incline Machine / DB Press", defaultSets: 3, reps: "10–12", restSeconds: 60,
-          loggable: true, lengthened: true,
-          muscles: "Upper Chest",
-          cues: "Smooth 3×/week upper-chest stimulus with low joint fatigue so Saturday dips stay fresh.",
-          avoid: "Grinding ugly reps."
-        },
-        {
-          id: "thu-2", pair: "A2", name: "Rope Face Pull / Reverse Pec Deck", defaultSets: 3, reps: "15", restSeconds: 60,
-          loggable: true,
-          muscles: "Rear Delts, External Rotators",
-          cues: "Pull rope apart to forehead/temples with external rotation; hold 1s peak squeeze.",
-          avoid: "Pulling low toward the chest."
-        },
-        {
-          id: "thu-3", pair: "B1", name: "Seated DB Lateral Raise", defaultSets: 4, reps: "12–15", restSeconds: 60,
-          loggable: true,
-          muscles: "Lateral Deltoids",
-          cues: "Seated upright removes momentum—completes 10 high-quality direct side-delt sets/week.",
-          avoid: "Leaning back into a front raise."
-        },
-        {
-          id: "thu-4", pair: "B2", name: "Hammer Curl + Rope Pushdown", defaultSets: 3, reps: "10–12 + 12–15", restSeconds: 60,
-          loggable: true,
-          muscles: "Brachialis, Forearms, Triceps",
-          cues: "Strict thumbs-up Hammer Curls (grip/arm thickness) paired directly with clean Rope Pushdowns.",
-          avoid: "Swinging elbows forward on curls or rolling shoulders on pushdowns."
-        },
-        {
-          id: "thu-5", pair: "C", name: "Quality Treadmill Run", defaultSets: 1, reps: "5m WU + Main + 4m CD", restSeconds: 0,
-          dynamicKey: "thu_treadmill", loggable: false,
-          muscles: "VO2max, Lactate Threshold, Insulin Sensitivity",
-          cues: "1.0–1.5% incline. 5m easy warm-up → weekly main set → 4m walk cool-down. 72h before Sunday's heavy legs.",
-          avoid: "Turning controlled threshold work into an all-out sprint."
-        }
+        { id: "thu-1", pair: "A1", name: "Incline Machine / DB Press", defaultSets: 3, reps: "10–12", restSeconds: 60, loggable: true, lengthened: true, muscles: "Upper Chest", cues: "Smooth 2s lower, crisp press; save joints for Saturday.", avoid: "Grinding ugly reps." },
+        { id: "thu-2", pair: "A2", name: "Face Pull / Reverse Fly", defaultSets: 3, reps: "15", restSeconds: 60, loggable: true, muscles: "Rear Delts · Rotators", cues: "Pull to temples with external rotation; 1s squeeze.", avoid: "Pulling low to chest." },
+        { id: "thu-3", pair: "B1", name: "Seated DB Lateral Raise", defaultSets: 4, reps: "12–15", restSeconds: 60, loggable: true, muscles: "Side Delts", cues: "Seated upright for zero swing; lead with elbows.", avoid: "Leaning back." },
+        { id: "thu-4", pair: "B2", name: "Hammer Curl + Pushdown", defaultSets: 3, reps: "10–12 + 12–15", restSeconds: 60, loggable: true, muscles: "Forearms · Biceps · Triceps", cues: "Thumbs-up Hammer Curls straight into crisp Rope Pushdowns.", avoid: "Swinging elbows." },
+        { id: "thu-5", pair: "C", name: "Quality Treadmill Run", defaultSets: 1, reps: "5m WU + Main + 4m CD", restSeconds: 0, dynamicKey: "thu_treadmill", loggable: false, muscles: "VO2max · Threshold", cues: "1–1.5% incline; 5m warm-up, weekly main set, 4m walk.", avoid: "All-out sprinting." }
       ]
     },
     {
-      dayIndex: 6,
-      dayName: "Friday",
-      shortName: "FRI",
-      letter: "F",
-      sessionTitle: "Full Rest & Recovery",
-      sessionType: "rest",
-      estimatedMinutes: 10,
-      summary: "Hit full protein + 5g creatine + 8h sleep before Saturday's heavy progression.",
+      dayIndex: 6, dayName: "Friday", shortName: "FRI", letter: "F",
+      sessionTitle: "Full Rest", sessionType: "rest", estimatedMinutes: 10,
+      summary: "Sleep 8h · Full Protein · 5g Creatine",
       exercises: [
-        {
-          id: "fri-1", pair: "1", name: "Nutrition, Sleep & Load Check", defaultSets: 1, reps: "10 min", restSeconds: 0,
-          loggable: false,
-          muscles: "Systemic & Myofibrillar Supercompensation",
-          cues: "Log all 4 protein feedings + 5g creatine, check weekly weight trend, and get 7.5–8.5h sleep for Saturday Upper A.",
-          avoid: "Under-eating protein on your full rest day."
-        }
+        { id: "fri-1", pair: "1", name: "Recovery Check", defaultSets: 1, reps: "Rest", restSeconds: 0, loggable: false, muscles: "Full Recovery", cues: "Hit 4 protein meals, 5g creatine, and 8h sleep for Saturday.", avoid: "Under-eating protein today." }
       ]
     }
   ]

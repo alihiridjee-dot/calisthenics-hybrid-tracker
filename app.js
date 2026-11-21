@@ -218,13 +218,13 @@ function getEffectiveSetsCount(exercise, weekObj) {
 
 function getExerciseSpecLine(exercise, weekObj) {
   const numSets = getEffectiveSetsCount(exercise, weekObj);
-  const restText = exercise.restSeconds > 0 ? ` · ${exercise.restSeconds}s rest` : "";
+  const restText = exercise.restSeconds > 0 ? ` · ${exercise.restSeconds}s` : "";
 
   if (exercise.dynamicKey === "upperA_pullup") {
-    return `<strong>+${weekObj.pullUpLoad} kg · ${weekObj.pullUpScheme}</strong> · ${weekObj.rirTarget}${restText}`;
+    return `<strong>+${weekObj.pullUpLoad}kg · ${weekObj.pullUpScheme}</strong> · ${weekObj.rirTarget}${restText}`;
   }
   if (exercise.dynamicKey === "upperA_dip") {
-    const load = weekObj.dipLoad > 0 ? `+${weekObj.dipLoad} kg` : "BW";
+    const load = weekObj.dipLoad > 0 ? `+${weekObj.dipLoad}kg` : "BW";
     return `<strong>${load} · ${weekObj.dipScheme}</strong> · ${weekObj.rirTarget}${restText}`;
   }
   if (exercise.dynamicKey === "upperB_volPullup") {
@@ -234,7 +234,7 @@ function getExerciseSpecLine(exercise, weekObj) {
     return `<strong>${weekObj.muscleUpDrill}</strong>${restText}`;
   }
   if (exercise.dynamicKey === "thu_treadmill") {
-    return `<strong>${weekObj.qualityRun}</strong> · 5m WU + 4m CD`;
+    return `<strong>${weekObj.qualityRun}</strong>`;
   }
   const rirPart = exercise.loggable ? ` · ${weekObj.rirTarget}` : "";
   return `<strong>${numSets} × ${exercise.reps}</strong>${rirPart}${restText}`;
@@ -274,11 +274,11 @@ function renderProteinStrip() {
 
   const statusEl = document.getElementById("ptStatusPill");
   if (consumed >= t.proteinTargetG) {
-    statusEl.textContent = "Target hit ✓";
+    statusEl.textContent = "Goal ✓";
   } else if (consumed >= t.proteinFloorG) {
-    statusEl.textContent = `Above 1.6g/kg floor`;
+    statusEl.textContent = "Floor ✓";
   } else {
-    statusEl.textContent = `Floor ${t.proteinFloorG}g`;
+    statusEl.textContent = `Min ${t.proteinFloorG}g`;
   }
 
   document.getElementById("ptBarFill").style.width = `${pct}%`;
@@ -387,9 +387,9 @@ function renderWorkoutTab() {
     const logKey = `w${state.currentWeek}_${ex.id}`;
     const curLog = state.exerciseLogs[logKey] || { kg: "", reps: "" };
     const prevLog = ex.loggable ? getPreviousExerciseLog(state.currentWeek, ex.id) : null;
-    const prevText = prevLog
-      ? `Prev W${prevLog.week}: ${prevLog.kg ? `${prevLog.kg}kg` : "BW"} × ${prevLog.reps || "—"}`
-      : "Double progression log";
+    const prevHtml = prevLog
+      ? `<span class="prev-hint">W${prevLog.week}: ${prevLog.kg ? `${prevLog.kg}kg` : "BW"} × ${prevLog.reps || "—"}</span>`
+      : "";
 
     const logbookHtml = ex.loggable ? `
       <div class="logbook-wrap">
@@ -398,12 +398,12 @@ function renderWorkoutTab() {
           <span class="log-x">×</span>
           <input type="text" inputmode="numeric" class="log-input" data-log-key="${logKey}" data-field="reps" value="${curLog.reps}" placeholder="reps" aria-label="Reps completed" />
         </div>
-        <span class="prev-hint">${prevText}</span>
+        ${prevHtml}
       </div>
     ` : "";
 
     const lengthenedHint = ex.lengthened
-      ? `<div class="fd-line"><strong>Stretch bonus:</strong> On your final set, add 2–3 controlled lengthened partials in the bottom half (Wolf 2023).</div>`
+      ? `<div class="fd-line"><strong>Last set:</strong> +2–3 bottom partials.</div>`
       : "";
 
     return `
@@ -426,8 +426,7 @@ function renderWorkoutTab() {
         </div>
 
         <div class="form-drawer ${isFormOpen ? "open" : ""}">
-          <div class="fd-line"><strong>Target:</strong> ${ex.muscles}</div>
-          <div class="fd-line"><strong>Cue:</strong> ${ex.cues}</div>
+          <div class="fd-line">${ex.cues}</div>
           ${lengthenedHint}
           <div class="fd-avoid">Avoid: ${ex.avoid}</div>
         </div>
@@ -484,7 +483,7 @@ function renderNutritionTab() {
 
   document.getElementById("bwDisplayVal").textContent = `${t.bw} kg`;
   document.getElementById("bmiSubText").textContent =
-    `${PLAN_DATA.meta.heightLabel} · BMI ${t.bmi} · South Asian Calibration`;
+    `${PLAN_DATA.meta.heightLabel} · BMI ${t.bmi}`;
 
   document.getElementById("goalRecompBtn").classList.toggle("active", t.mode === "recomp");
   document.getElementById("goalBulkBtn").classList.toggle("active", t.mode === "leanbulk");
@@ -498,38 +497,38 @@ function renderNutritionTab() {
     <div class="stat-box">
       <span class="sb-label">Calories</span>
       <strong class="sb-val">${t.targetKcal}</strong>
-      <span class="sb-sub">${t.mode === "recomp" ? "Maintenance" : "+7.5% surplus"}</span>
+      <span class="sb-sub">${t.mode === "recomp" ? "Maintenance" : "+7.5%"}</span>
     </div>
     <div class="stat-box">
       <span class="sb-label">Carbs / Fat</span>
       <strong class="sb-val">${t.carbG} / ${t.fatG}g</strong>
-      <span class="sb-sub">~${t.periCarbG}g peri-gym</span>
+      <span class="sb-sub">${t.periCarbG}g around gym</span>
     </div>
   `;
 
   const scaleText = t.mode === "recomp"
-    ? "Hold weight steady while waist drops & lifts climb"
-    : `+${t.gainMin}–${t.gainMax} kg/wk (Helms 2023)`;
+    ? "Steady weight"
+    : `+${t.gainMin}–${t.gainMax} kg / wk`;
 
   document.getElementById("fdLandmarks").innerHTML = `
     <div class="kv-row">
-      <span class="kv-k">Per-meal target (4 meals)</span>
+      <span class="kv-k">Per meal (×4)</span>
       <span class="kv-v">${t.perMealG}g (~${t.leucinePerMealG}g leucine)</span>
     </div>
     <div class="kv-row">
-      <span class="kv-k">Minimum floor (Morton 2018 · 1.6 g/kg)</span>
-      <span class="kv-v">${t.proteinFloorG} g/day</span>
+      <span class="kv-k">Daily minimum</span>
+      <span class="kv-v">${t.proteinFloorG}g (1.6 g/kg)</span>
     </div>
     <div class="kv-row">
-      <span class="kv-k">Upper CI ceiling (2.2 g/kg)</span>
-      <span class="kv-v">${t.proteinCeilingG} g/day</span>
+      <span class="kv-k">Upper ceiling</span>
+      <span class="kv-v">${t.proteinCeilingG}g (2.2 g/kg)</span>
     </div>
     <div class="kv-row">
-      <span class="kv-k">Daily creatine (Kreider 2017)</span>
-      <span class="kv-v">5g Monohydrate</span>
+      <span class="kv-k">Creatine</span>
+      <span class="kv-v">5g / day</span>
     </div>
     <div class="kv-row">
-      <span class="kv-k">Weekly scale target</span>
+      <span class="kv-k">Scale goal</span>
       <span class="kv-v">${scaleText}</span>
     </div>
   `;
@@ -541,7 +540,6 @@ function renderNutritionTab() {
         <span class="li-meta">${m.tag}</span>
       </div>
       <div class="li-sub">${m.detail}</div>
-      <div class="li-accent">${m.macros}</div>
     </div>
   `).join("");
 
@@ -594,8 +592,8 @@ function renderPlanTab() {
   `).join("");
 
   // Muscle-Up Pathway
-  document.getElementById("muCurrentWeekBadge").textContent = `Week ${weekObj.week}`;
-  document.getElementById("muActiveLine").textContent = `Tuesday drill: ${weekObj.muscleUpDrill}`;
+  document.getElementById("muCurrentWeekBadge").textContent = `W${weekObj.week}`;
+  document.getElementById("muActiveLine").textContent = `Tue: ${weekObj.muscleUpDrill}`;
 
   const muEl = document.getElementById("muStagesStack");
   muEl.innerHTML = PLAN_DATA.muscleUpStages.map(st => {
@@ -608,7 +606,7 @@ function renderPlanTab() {
             <span class="li-title">${st.stage}. ${st.title}</span>
             <span class="li-meta">${st.weeks}</span>
           </div>
-          <div class="li-sub">${st.target} — ${st.cue}</div>
+          <div class="li-sub">${st.target}</div>
         </div>
       </div>
     `;

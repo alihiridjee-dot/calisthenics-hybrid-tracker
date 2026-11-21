@@ -1,10 +1,10 @@
-const CACHE_NAME = "26w-studio-v5";
+const CACHE_NAME = "26w-studio-v6";
 const ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=5",
-  "./data.js?v=5",
-  "./app.js?v=5",
+  "./styles.css?v=6",
+  "./data.js?v=6",
+  "./app.js?v=6",
   "./manifest.json",
   "./icon.svg"
 ];
