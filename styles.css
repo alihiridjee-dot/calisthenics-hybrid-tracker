@@ -966,7 +966,34 @@ button, input {
   transform: rotate(180deg);
 }
 
-/* Tab 3: Muscle-Up Stages, Volume Bars, 26W Grid */
+/* Tab 3: Overview, Muscle-Up Stages, Volume Bars, 26W Grid */
+.sub-heading {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-3);
+  margin-bottom: 6px;
+}
+
+.split-row-btn {
+  width: 100%;
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.split-day {
+  display: inline-block;
+  min-width: 30px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
 .mu-item {
   cursor: pointer;
   display: flex;
