@@ -5,338 +5,239 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="26W Studio" />
-  <meta name="theme-color" content="#f0ebe1" />
+  <meta name="apple-mobile-web-app-title" content="26W" />
+  <meta name="theme-color" content="#f7f7f8" />
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" type="image/svg+xml" href="icon.svg" />
   <link rel="apple-touch-icon" href="icon.svg" />
-  <title>26W • South Asian Hypertrophy, Protein &amp; Muscle-Up Studio</title>
+  <title>26W · Hypertrophy, Muscle-Up &amp; Protein</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Syne:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <!-- Tactile Analog Paper Grain -->
-  <div class="paper-grain"></div>
+  <div class="app-shell">
 
-  <div class="canvas-shell">
-
-    <!-- 1. TOP INSTRUMENT BAR (ROTARY WEEK DIAL + 3-MODE TACTILE SWITCHER) -->
-    <header class="folio-header">
-      <div class="folio-top-bar">
-        <div class="week-dial-pill">
-          <button id="prevWeekBtn" class="dial-arrow" aria-label="Previous Week">←</button>
-          <span class="dial-label" id="weekDialText">WEEK 01 / 26</span>
-          <button id="nextWeekBtn" class="dial-arrow" aria-label="Next Week">→</button>
+    <!-- Minimal Top Header -->
+    <header class="top-header">
+      <div class="header-row">
+        <div class="week-nav">
+          <button id="prevWeekBtn" class="icon-btn" aria-label="Previous week">‹</button>
+          <div class="week-meta">
+            <span class="week-title" id="weekDialText">Week 1 / 26</span>
+            <span class="week-sub" id="phaseTagText">Meso 1 · Foundation · 2–3 RIR</span>
+          </div>
+          <button id="nextWeekBtn" class="icon-btn" aria-label="Next week">›</button>
         </div>
 
-        <div class="folio-phase-tag" id="phaseTagText">PHASE 1 · ACCUMULATION</div>
-
-        <button id="jumpTodayQuickBtn" class="orbit-trigger-btn" title="Jump to Today's Session">
-          <span class="orbit-dot"></span> Today
-        </button>
+        <button id="jumpTodayQuickBtn" class="ghost-btn">Today</button>
       </div>
 
-      <!-- Tactile 3-Way Studio Mode Switcher -->
-      <nav class="studio-mode-switcher" role="tablist">
-        <button class="mode-pill active" data-mode="workout">
-          <span class="mode-num">01</span> Today's Session
-        </button>
-        <button class="mode-pill" data-mode="muscleup">
-          <span class="mode-num">02</span> Muscle-Up Lab
-        </button>
-        <button class="mode-pill" data-mode="genetics">
-          <span class="mode-num">03</span> Fuel &amp; 26W
-        </button>
+      <!-- Clean 3-Tab Segmented Switcher -->
+      <nav class="tab-bar" role="tablist">
+        <button class="tab-btn active" data-mode="workout">Workout</button>
+        <button class="tab-btn" data-mode="nutrition">Nutrition</button>
+        <button class="tab-btn" data-mode="plan">26W Plan</button>
       </nav>
     </header>
 
-    <!-- ================================================================= -->
-    <!-- MODE 01: TODAY'S 60-MIN WORKOUT + DAILY PROTEIN CANVAS            -->
-    <!-- ================================================================= -->
-    <section id="mode-workout" class="studio-panel active">
+    <!-- =============================================================== -->
+    <!-- TAB 1: WORKOUT (TODAY'S 60-MIN SESSION + PROTEIN STRIP)         -->
+    <!-- =============================================================== -->
+    <section id="mode-workout" class="tab-panel active">
 
-      <!-- Editorial Poster Stage + Sculptural Progress Ring -->
-      <div class="poster-stage">
-        <div class="poster-left">
-          <div class="poster-meta-row">
-            <span class="poster-date-line" id="posterDateLine">Saturday, 21 November</span>
-            <span class="today-badge hidden" id="todayBadge">TODAY</span>
-            <span class="duration-capsule" id="durationCapsule">⏱ 60 MIN SESSION</span>
+      <!-- Minimal 7-Day Calendar Strip (SAT -> FRI) -->
+      <div class="day-strip" id="dayRibbon"></div>
+
+      <!-- Clean Session Summary Header -->
+      <div class="session-head">
+        <div class="sh-top">
+          <div class="sh-date-wrap">
+            <span class="sh-date" id="posterDateLine">Saturday, 21 Nov</span>
+            <span class="today-tag hidden" id="todayBadge">Today</span>
           </div>
-          <h1 class="poster-session-title" id="posterTitle">Upper A (Heavy V-Taper)</h1>
-          <p class="poster-focus-note" id="posterFocusNote">
-            60-Min Pure Hypertrophy: Antagonist Pull/Push Pairs + Delts &amp; Arms.
-          </p>
+          <span class="sh-meta" id="durationCapsule">60 min · 0/23 sets</span>
         </div>
-
-        <!-- Sculptural Progress Ring + Giant Day Watermark -->
-        <div class="poster-sculpture" id="posterCompleteTrigger" title="Tap to stamp entire workout complete">
-          <svg class="sculpture-ring" width="98" height="98" viewBox="0 0 98 98">
-            <circle class="s-ring-track" cx="49" cy="49" r="42" />
-            <circle class="s-ring-bar" id="sculptureRingBar" cx="49" cy="49" r="42" stroke-dasharray="263.9" stroke-dashoffset="263.9" />
-          </svg>
-          <div class="sculpture-inner">
-            <span class="sculpture-num" id="sculptureDayNum">21</span>
-            <span class="sculpture-sub" id="sculpturePctText">0%</span>
+        <h1 class="sh-title" id="posterTitle">Upper A · Heavy V-Taper</h1>
+        <p class="sh-desc" id="posterFocusNote"></p>
+        <div class="sh-progress-row">
+          <div class="linear-track">
+            <div class="linear-fill" id="sessionProgressFill" style="width:0%"></div>
           </div>
+          <button id="markAllDoneBtn" class="text-action">Mark all</button>
         </div>
       </div>
 
-      <!-- Session Time-Budget Strip & Plain-English Decoder Trigger -->
-      <div class="time-budget-bar">
-        <div class="tb-left">
-          <span class="tb-tag">60M BUDGET</span>
-          <span class="tb-text" id="timeBreakdownText">6m Warm-Up · 18m A1/A2 · 14m B1/B2 · 13m C1/C2 · 9m Finisher</span>
-        </div>
-        <button id="toggleDecoderBtn" class="decoder-pill-btn">
-          Guide &amp; Terms
-        </button>
-      </div>
-
-      <!-- Expandable Plain-English Notation Decoder Drawer -->
-      <div id="decoderBox" class="decoder-drawer hidden">
-        <div class="decoder-grid" id="decoderGrid">
-          <!-- Populated by JS -->
-        </div>
-      </div>
-
-      <!-- Tactile 7-Day Ribbon (SAT SUN MON TUE WED THU FRI) -->
-      <div class="day-ribbon" id="dayRibbon">
-        <!-- Populated by JS -->
-      </div>
-
-      <!-- Daily Protein & Creatine Target Card (Peer-Reviewed 2.0-2.2 g/kg Tracker) -->
-      <div class="protein-tracker-card" id="proteinTrackerCard">
-        <div class="pt-header">
-          <div>
-            <span class="pt-eyebrow" id="ptModeEyebrow">DAILY PROTEIN GOAL · 2.13 g/kg (RECOMP)</span>
-            <div class="pt-totals-row">
-              <strong class="pt-current" id="ptCurrentVal">0g</strong>
-              <span class="pt-slash">/</span>
-              <span class="pt-target" id="ptTargetVal">160g</span>
-              <span class="pt-status-pill" id="ptStatusPill">Floor: 120g (1.6 g/kg)</span>
-            </div>
+      <!-- Compact Daily Protein & Creatine Strip -->
+      <div class="card protein-card" id="proteinTrackerCard">
+        <div class="pc-top">
+          <div class="pc-stats">
+            <span class="pc-label">Protein</span>
+            <strong class="pc-val" id="ptCurrentVal">0g</strong>
+            <span class="pc-target" id="ptTargetVal">/ 160g</span>
+            <span class="pc-status" id="ptStatusPill">Floor 120g</span>
           </div>
-          <button id="openFuelGuideBtn" class="pt-guide-link" title="Open Protein Research &amp; Meal Ideas">
-            Meal Ideas →
-          </button>
+          <button id="creatineToggleBtn" class="creatine-btn">5g Creatine</button>
         </div>
 
-        <!-- Progress Track with 1.6 g/kg Morton Floor Tick -->
-        <div class="pt-bar-wrap">
-          <div class="pt-bar-track">
-            <div class="pt-bar-fill" id="ptBarFill" style="width: 0%"></div>
-            <div class="pt-floor-marker" id="ptFloorMarker" style="left: 75%" title="1.6 g/kg Minimum Hypertrophy Floor (Morton 2018)"></div>
-          </div>
-          <div class="pt-bar-scale">
-            <span>0g</span>
-            <span id="ptFloorLabel">120g Floor (1.6 g/kg)</span>
-            <span id="ptCeilingLabel">160g Target</span>
+        <div class="pc-bar-wrap">
+          <div class="pc-bar-track">
+            <div class="pc-bar-fill" id="ptBarFill" style="width:0%"></div>
+            <div class="pc-floor-tick" id="ptFloorMarker" style="left:75%" title="1.6 g/kg floor"></div>
           </div>
         </div>
 
-        <!-- 4 One-Tap Schoenfeld & Aragon Meal Bolus Pills (0.4-0.55 g/kg/meal) -->
-        <div class="pt-meals-grid" id="ptMealsGrid">
-          <!-- Populated by JS -->
-        </div>
+        <div class="pc-meals" id="ptMealsGrid"></div>
 
-        <!-- Quick Fine-Tune + 5g Creatine Row -->
-        <div class="pt-footer-row">
-          <div class="pt-quick-adjust">
-            <button id="ptMinus10" class="pt-adj-btn" title="Remove 10g protein">−10g</button>
-            <button id="ptPlus10" class="pt-adj-btn" title="Add 10g protein">+10g</button>
-            <button id="ptPlus25" class="pt-adj-btn accent" title="Add 25g whey scoop">+25g Scoop</button>
+        <div class="pc-footer">
+          <div class="pc-adjust">
+            <button id="ptMinus10" class="mini-btn">−10g</button>
+            <button id="ptPlus10" class="mini-btn">+10g</button>
+            <button id="ptPlus25" class="mini-btn">+25g whey</button>
           </div>
-          <button id="creatineToggleBtn" class="creatine-pill">
-            <span class="cr-dot"></span> 5g Creatine
-          </button>
+          <button id="openFuelGuideBtn" class="text-action">Meal ideas →</button>
         </div>
       </div>
 
-      <!-- Interactive Movement Deck (Tactile Cards with Giant Circular Orbs) -->
-      <main class="movement-deck" id="movementDeck">
-        <!-- Populated by JS -->
-      </main>
+      <!-- Exercise List (with inline kg × reps logbook & set circles) -->
+      <main class="exercise-list" id="movementDeck"></main>
 
-      <!-- Analog Field Log Footer -->
-      <footer class="field-note-box">
-        <div class="fn-header">
-          <span class="fn-title">Daily Field Log</span>
-          <span class="fn-status" id="fnSaveStatus">Synced to device</span>
+      <!-- Minimal Session Note -->
+      <div class="card note-card">
+        <div class="note-head">
+          <span class="section-label">Session Note</span>
+          <span class="note-status" id="fnSaveStatus">Saved locally</span>
         </div>
         <input
           type="text"
           id="dailyNoteInput"
-          class="fn-input"
-          placeholder="Record top set weights, actual reps, bodyweight, or session feel..."
+          class="note-input"
+          placeholder="How did top sets feel? Energy, sleep, or weight..."
         />
-      </footer>
-    </section>
-
-    <!-- ================================================================= -->
-    <!-- MODE 02: BAR MUSCLE-UP MASTERY LAB                                -->
-    <!-- ================================================================= -->
-    <section id="mode-muscleup" class="studio-panel">
-      <div class="lab-hero-card">
-        <div class="lab-hero-top">
-          <span class="lab-badge">26-WEEK SKILL PATHWAY</span>
-          <span class="lab-current-wk" id="muCurrentWeekBadge">WEEK 1 DRILL</span>
-        </div>
-        <h2 class="lab-title">Strict Bar <em>Muscle-Up</em> Lab</h2>
-        <p class="lab-sub">
-          A Bar Muscle-Up isn't just a strong pull-up—it's a <strong>C-curve arc around the bar</strong> combined with a fast wrist turnover. Every <strong>Tuesday (Upper B)</strong> opens with 9 minutes of fresh Muscle-Up skill work before your volume pairs.
-        </p>
-
-        <!-- SVG Biomechanical Arc Diagram -->
-        <div class="mu-arc-diagram">
-          <svg viewBox="0 0 380 120" width="100%" height="115">
-            <!-- Bar Point -->
-            <circle cx="190" cy="28" r="7" fill="#d94e28" />
-            <text x="204" y="32" font-size="10" font-weight="700" fill="#faf7f2">THE BAR (PIVOT)</text>
-
-            <!-- Wrong Vertical Path -->
-            <line x1="190" y1="105" x2="190" y2="42" stroke="rgba(255,255,255,0.22)" stroke-width="1.8" stroke-dasharray="4 4" />
-            <text x="196" y="88" font-size="9" fill="rgba(255,255,255,0.45)">✕ Vertical pull hits bar</text>
-
-            <!-- Correct C-Curve Trajectory -->
-            <path d="M 190 104 Q 245 92 225 58 Q 205 24 165 18" fill="none" stroke="#fbbf24" stroke-width="3" stroke-linecap="round" />
-            <circle cx="226" cy="84" r="4" fill="#fbbf24" />
-            <text x="236" y="87" font-size="9.5" font-weight="700" fill="#fbbf24">1. Hollow C-Swing Forward</text>
-            <text x="64" y="64" font-size="9.5" font-weight="700" fill="#faf7f2">2. Pull Bar to Belly</text>
-            <text x="58" y="22" font-size="9.5" font-weight="700" fill="#34d399">3. Snap Chest Over Bar</text>
-          </svg>
-        </div>
-
-        <div class="mu-active-prescription" id="muActiveDrillBox">
-          <!-- Populated by JS -->
-        </div>
-      </div>
-
-      <div class="lab-section-label">5 UNLOCKABLE PROGRESSION STAGES (TAP TO STAMP MASTERED)</div>
-      <div class="mu-stages-stack" id="muStagesStack">
-        <!-- Populated by JS -->
       </div>
     </section>
 
-    <!-- ================================================================= -->
-    <!-- MODE 03: PROTEIN, SOUTH ASIAN SCIENCE & 26-WEEK MATRIX            -->
-    <!-- ================================================================= -->
-    <section id="mode-genetics" class="studio-panel">
+    <!-- =============================================================== -->
+    <!-- TAB 2: NUTRITION (PROTEIN ENGINE, MEALS & PEER-REVIEWED SCIENCE) -->
+    <!-- =============================================================== -->
+    <section id="mode-nutrition" class="tab-panel">
 
-      <!-- 1. Interactive Evidence-Based Protein & Calorie Dial -->
-      <div class="fuel-dial-card">
-        <div class="fd-row">
+      <!-- Bodyweight & Goal Calculator -->
+      <div class="card">
+        <div class="bw-row">
           <div>
-            <span class="fd-eyebrow">PEER-REVIEWED PROTEIN &amp; MACRO ENGINE</span>
-            <span class="fd-label">Bodyweight · 6'0" (183 cm)</span>
-            <span class="fd-sub" id="bmiSubText">BMI 22.4 · South Asian Hardgainer / Thin-Fat Calibration</span>
+            <div class="card-title">Daily Targets</div>
+            <div class="card-sub" id="bmiSubText">6'0" (183 cm) · BMI 22.4</div>
           </div>
-          <div class="fd-stepper">
-            <button id="bwMinus" class="step-btn" aria-label="Decrease bodyweight">−</button>
-            <span class="fd-weight-val" id="bwDisplayVal">75 kg</span>
-            <button id="bwPlus" class="step-btn" aria-label="Increase bodyweight">+</button>
+          <div class="stepper">
+            <button id="bwMinus" class="step-btn" aria-label="Decrease weight">−</button>
+            <span class="step-val" id="bwDisplayVal">75 kg</span>
+            <button id="bwPlus" class="step-btn" aria-label="Increase weight">+</button>
           </div>
         </div>
 
-        <!-- 2-Way Goal Mode Switcher (Recomp vs Controlled Lean Bulk) -->
-        <div class="goal-switcher" role="group" aria-label="Nutrition Goal Phase">
-          <button class="goal-pill active" data-goal="recomp" id="goalRecompBtn">
-            <span class="gp-title">Skinny-Fat Recomp</span>
-            <span class="gp-sub">Maintenance · 2.13 g/kg Protein</span>
+        <div class="segmented" role="group" aria-label="Goal phase">
+          <button class="seg-btn active" data-goal="recomp" id="goalRecompBtn">
+            Recomp <span class="seg-hint">Maintenance</span>
           </button>
-          <button class="goal-pill" data-goal="leanbulk" id="goalBulkBtn">
-            <span class="gp-title">Controlled Lean Bulk</span>
-            <span class="gp-sub">+7% Surplus · 2.0 g/kg Protein</span>
+          <button class="seg-btn" data-goal="leanbulk" id="goalBulkBtn">
+            Lean Bulk <span class="seg-hint">+7.5% surplus</span>
           </button>
         </div>
 
-        <!-- Live Macro Cards -->
-        <div class="macro-summary-grid" id="macroSummaryGrid">
-          <!-- Populated by JS -->
-        </div>
-
-        <div class="fd-landmarks" id="fdLandmarks">
-          <!-- Populated by JS -->
-        </div>
+        <div class="stat-grid" id="macroSummaryGrid"></div>
+        <div class="kv-list" id="fdLandmarks"></div>
       </div>
 
-      <!-- 2. Practical South Asian 40g Protein Meal Blueprints -->
-      <div class="section-card">
-        <span class="gm-eyebrow">HITTING 4 × ~40g PROTEIN (≥3g LEUCINE / MEAL)</span>
-        <h2 class="gm-title">South Asian High-Protein Meal Builders</h2>
-        <p class="gm-summary">
-          Traditional dal-roti-rice meals average only 12–16g of lower-leucine protein. Pair staples with complete proteins so every meal crosses the ~3g leucine trigger (Jäger et al., 2017):
-        </p>
-        <div class="meal-ideas-grid" id="mealIdeasGrid">
-          <!-- Populated by JS -->
+      <!-- South Asian ~40g Protein Meal Builders -->
+      <div class="card">
+        <div class="card-title">40g Protein Meal Builders</div>
+        <div class="card-sub" style="margin-bottom:12px;">
+          4 feedings of ~38–40g protein (~3g+ leucine each) to beat anabolic resistance and balance South Asian staple carbs.
         </div>
+        <div class="clean-list" id="mealIdeasGrid"></div>
       </div>
 
-      <!-- 3. Weekly Hypertrophy Volume Audit (Why 60-Min Sessions Grow More Muscle) -->
-      <div class="section-card">
-        <span class="gm-eyebrow">WEEKLY SET AUDIT (SCHOENFELD ET AL. 2016, 2017)</span>
-        <h2 class="gm-title">Hardgainer Hypertrophy Volume Map</h2>
-        <p class="gm-summary">
-          Long-limbed 6'0" lifters rarely grow on low-volume bro splits. Every major muscle is stimulated <strong>2–3× per week</strong> inside the evidence-based 10–17 hard sets/week hypertrophy zone:
-        </p>
-        <div class="volume-audit-grid" id="volumeAuditGrid">
-          <!-- Populated by JS -->
+      <!-- Collapsible Peer-Reviewed Studies -->
+      <details class="card accordion-card">
+        <summary class="acc-summary">
+          <div>
+            <div class="card-title">Peer-Reviewed Evidence</div>
+            <div class="card-sub">8 studies behind your protein, volume &amp; recomp targets</div>
+          </div>
+          <span class="acc-chevron">▾</span>
+        </summary>
+        <div class="clean-list" id="researchStack" style="margin-top:12px;"></div>
+      </details>
+    </section>
+
+    <!-- =============================================================== -->
+    <!-- TAB 3: 26W PLAN (MUSCLE-UP, VOLUME, COACHES & 26W SCHEDULE)     -->
+    <!-- =============================================================== -->
+    <section id="mode-plan" class="tab-panel">
+
+      <!-- Bar Muscle-Up Progression -->
+      <div class="card">
+        <div class="card-head-row">
+          <div>
+            <div class="card-title">Bar Muscle-Up Pathway</div>
+            <div class="card-sub" id="muActiveLine">Tuesday fresh skill primer</div>
+          </div>
+          <span class="subtle-badge" id="muCurrentWeekBadge">Week 1</span>
         </div>
+        <div class="clean-list" id="muStagesStack" style="margin-top:12px;"></div>
       </div>
 
-      <!-- 4. South Asian Thin-Fat Physiology & Hardgainer Architecture -->
-      <div class="genetics-manifesto-card">
-        <span class="gm-eyebrow">EVIDENCE-BASED SOUTH ASIAN PHYSIOLOGY</span>
-        <h2 class="gm-title" id="saHeadline">South Asian Thin-Fat Recomp &amp; Hardgainer Architecture</h2>
-        <p class="gm-summary" id="saSummary"></p>
-
-        <div class="gm-pillars-grid" id="saPillarsGrid">
-          <!-- Populated by JS -->
+      <!-- Weekly Hypertrophy Volume Audit -->
+      <div class="card">
+        <div class="card-title">Weekly Volume (Hard Sets)</div>
+        <div class="card-sub" style="margin-bottom:12px;">
+          Every muscle trained 2–3×/week inside the 10–17 set hypertrophy zone.
         </div>
+        <div class="vol-list" id="volumeAuditGrid"></div>
       </div>
 
-      <!-- 5. Peer-Reviewed Research Library -->
-      <div class="section-card">
-        <span class="gm-eyebrow">PEER-REVIEWED LITERATURE</span>
-        <h2 class="gm-title">Scientific References Behind This Plan</h2>
-        <div class="research-stack" id="researchStack">
-          <!-- Populated by JS -->
-        </div>
-      </div>
+      <!-- Program Architects (Collapsible) -->
+      <details class="card accordion-card">
+        <summary class="acc-summary">
+          <div>
+            <div class="card-title">Coaching Frameworks Synthesized</div>
+            <div class="card-sub">Schoenfeld · Israetel · Helms · Nippard &amp; Wolf · Low &amp; Zlat · Schumann</div>
+          </div>
+          <span class="acc-chevron">▾</span>
+        </summary>
+        <div class="clean-list" id="coachesList" style="margin-top:12px;"></div>
+      </details>
 
-      <!-- 6. 26-Week Master Matrix -->
-      <div class="matrix-section-header">
-        <div>
-          <span class="fd-eyebrow">MACROCYCLE HORIZON (NOV 2026 – MAY 2027)</span>
-          <h3 class="matrix-heading">26-Week Progression Matrix</h3>
+      <!-- 26-Week Schedule -->
+      <div class="card">
+        <div class="card-head-row" style="margin-bottom:12px;">
+          <div>
+            <div class="card-title">26-Week Roadmap</div>
+            <div class="card-sub">21 Nov 2026 – 21 May 2027 · Tap any week</div>
+          </div>
+          <div class="util-actions">
+            <button id="exportJsonBtn" class="mini-btn">Backup</button>
+            <button id="resetDayBtn" class="mini-btn danger">Clear day</button>
+          </div>
         </div>
-        <div class="md-footer-actions">
-          <button id="exportJsonBtn" class="action-pill">Backup JSON</button>
-          <button id="resetDayBtn" class="action-pill danger">Clear Today</button>
-        </div>
-      </div>
-
-      <p class="md-hint">Starts Saturday, 21 Nov 2026. Tap any week tile to load its exact loads, Muscle-Up drill, and treadmill progression:</p>
-      <div class="week-matrix-grid" id="weekMatrixGrid">
-        <!-- Populated by JS -->
+        <div class="week-grid" id="weekMatrixGrid"></div>
       </div>
     </section>
 
   </div>
 
-  <!-- FLOATING DYNAMIC REST PILL -->
-  <div id="restPill" class="rest-pill hidden">
-    <div class="rp-left">
-      <span class="rp-pulse"></span>
-      <span class="rp-title">RECOVERY TIMER</span>
-      <strong class="rp-clock" id="rpClock">01:30</strong>
+  <!-- Minimal Floating Rest Timer -->
+  <div id="restPill" class="rest-bar hidden">
+    <div class="rb-left">
+      <span class="rb-label">Rest</span>
+      <strong class="rb-clock" id="rpClock">01:30</strong>
     </div>
-    <div class="rp-controls">
-      <button id="rpMinus" class="rp-btn">-15s</button>
-      <button id="rpPlus" class="rp-btn">+15s</button>
-      <button id="rpClose" class="rp-btn rp-dismiss">✕</button>
+    <div class="rb-actions">
+      <button id="rpMinus" class="rb-btn">−15s</button>
+      <button id="rpPlus" class="rb-btn">+15s</button>
+      <button id="rpClose" class="rb-btn">Done</button>
     </div>
   </div>
 

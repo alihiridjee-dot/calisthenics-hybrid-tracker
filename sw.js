@@ -1,4 +1,4 @@
-const CACHE_NAME = "26w-studio-v2";
+const CACHE_NAME = "26w-studio-v3";
 const ASSETS = [
   "./",
   "./index.html",

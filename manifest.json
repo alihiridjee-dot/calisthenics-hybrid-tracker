@@ -4,8 +4,8 @@
   "description": "26-Week 60-Min Hardgainer Hypertrophy, Evidence-Based Protein Tracker & Bar Muscle-Up Lab",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#f0ebe1",
-  "theme_color": "#f0ebe1",
+  "background_color": "#f7f7f8",
+  "theme_color": "#f7f7f8",
   "orientation": "portrait",
   "icons": [
     {

@@ -1,9 +1,8 @@
-// 26W • South Asian Hardgainer Hypertrophy, Protein Targets & 60-Min Tactile Studio Logic
+// 26W · Minimalist Hypertrophy, Muscle-Up & Protein Logbook Logic
 
-const STORAGE_KEY = "hybrid26_tracker_state_v3";
-const LEGACY_STORAGE_KEY = "hybrid26_tracker_state_v2";
+const STORAGE_KEY = "hybrid26_tracker_state_v4";
+const PREV_STORAGE_KEY = "hybrid26_tracker_state_v3";
 
-// Local Calendar Date Utilities
 function getLocalIsoDate(d = new Date()) {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, "0");
@@ -40,18 +39,18 @@ function getTodayProgramPosition() {
 const initialToday = getTodayProgramPosition();
 
 const defaultState = {
-  activeMode: "workout", // "workout" | "muscleup" | "genetics"
+  activeMode: "workout", // "workout" | "nutrition" | "plan"
   currentWeek: initialToday.week,
   currentDayIndex: initialToday.dayIndex,
   lastVisitedIsoDate: initialToday.todayIso,
   bodyweightKg: PLAN_DATA.meta.defaultBodyweightKg,
-  goalMode: PLAN_DATA.meta.defaultGoalMode, // "recomp" | "leanbulk"
+  goalMode: PLAN_DATA.meta.defaultGoalMode,
   setChecks: {},
+  exerciseLogs: {}, // { w1_sat-1: { kg: "5", reps: "5" } }
   nutritionLog: {}, // { w1_d0: { meals: [bool, bool, bool, bool], extraG: 0, creatine: bool } }
   dayNotes: {},
-  openBlueprints: {},
-  unlockedMuStages: {},
-  decoderOpen: false
+  openForms: {},
+  unlockedMuStages: {}
 };
 
 let state = loadState();
@@ -63,7 +62,9 @@ function loadState() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = { ...defaultState, ...JSON.parse(raw) };
-      // If it's a new calendar day, automatically open to today's real session
+      if (!["workout", "nutrition", "plan"].includes(parsed.activeMode)) {
+        parsed.activeMode = "workout";
+      }
       const todayPos = getTodayProgramPosition();
       if (parsed.lastVisitedIsoDate !== todayPos.todayIso && todayPos.isInProgramRange) {
         parsed.currentWeek = todayPos.week;
@@ -73,14 +74,17 @@ function loadState() {
       return parsed;
     }
 
-    // Migrate bodyweight & muscle-up milestones gently from v2 if present
-    const legacyRaw = localStorage.getItem(LEGACY_STORAGE_KEY);
-    if (legacyRaw) {
-      const legacy = JSON.parse(legacyRaw);
+    const prevRaw = localStorage.getItem(PREV_STORAGE_KEY);
+    if (prevRaw) {
+      const prev = JSON.parse(prevRaw);
       return {
         ...defaultState,
-        bodyweightKg: legacy.bodyweightKg || PLAN_DATA.meta.defaultBodyweightKg,
-        unlockedMuStages: legacy.unlockedMuStages || {}
+        bodyweightKg: prev.bodyweightKg || PLAN_DATA.meta.defaultBodyweightKg,
+        goalMode: prev.goalMode || PLAN_DATA.meta.defaultGoalMode,
+        setChecks: prev.setChecks || {},
+        nutritionLog: prev.nutritionLog || {},
+        dayNotes: prev.dayNotes || {},
+        unlockedMuStages: prev.unlockedMuStages || {}
       };
     }
     return { ...defaultState };
@@ -110,11 +114,8 @@ function dateToIsoUtc(dt) {
   return `${y}-${m}-${d}`;
 }
 
-function formatEditorialDate(dt, dayName) {
-  const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-  ];
+function formatDateHeading(dt, dayName) {
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   return `${dayName}, ${dt.getUTCDate()} ${months[dt.getUTCMonth()]}`;
 }
 
@@ -123,65 +124,44 @@ function formatShortDate(dt) {
   return `${dt.getUTCDate()} ${months[dt.getUTCMonth()]}`;
 }
 
-// Evidence-Based Nutrition & Protein Calculations (Morton 2018, Schoenfeld & Aragon 2018, Barakat 2020, Helms 2023)
+// Nutrition Calculations
 function getNutritionTargets() {
   const bw = parseFloat(state.bodyweightKg) || 75;
   const heightM = PLAN_DATA.meta.heightCm / 100;
   const bmi = (bw / (heightM * heightM)).toFixed(1);
   const mode = state.goalMode || "recomp";
 
-  // Protein Floor (Morton et al., 2018 mean breakpoint = 1.62 g/kg) & Upper CI (2.2 g/kg)
   const proteinFloorG = Math.round(bw * 1.6);
   const proteinCeilingG = Math.round(bw * 2.2);
-
-  // Per-meal bolus scaled to 4 meals (Schoenfeld & Aragon 2018: 0.40-0.55 g/kg/meal)
-  // Recomp uses ~2.13 g/kg (Barakat et al. 2020); Lean Bulk uses ~2.0 g/kg leaving extra carb room
-  const targetMultiplier = mode === "recomp" ? 2.13 : 2.0;
-  const perMealG = Math.round((bw * targetMultiplier) / 4);
-  const proteinTargetG = perMealG * 4; // Ensures 4 meal pills = 100% cleanly
+  const targetMult = mode === "recomp" ? 2.13 : 2.0;
+  const perMealG = Math.round((bw * targetMult) / 4);
+  const proteinTargetG = perMealG * 4;
   const actualGPerKg = (proteinTargetG / bw).toFixed(2);
-  const leucinePerMealG = (perMealG * 0.088).toFixed(1); // ~8.5-9.5% leucine in complete animal/whey proteins
+  const leucinePerMealG = (perMealG * 0.088).toFixed(1);
 
-  // Estimated maintenance kcal for 6'0" (183 cm) male training 5x/week (~34.5 kcal/kg baseline)
   const maintenanceKcal = Math.round((bw * 34.5) / 25) * 25;
   const targetKcal = mode === "recomp"
     ? maintenanceKcal
-    : Math.round((maintenanceKcal * 1.075) / 25) * 25; // +7.5% controlled lean surplus (Helms et al. 2023)
+    : Math.round((maintenanceKcal * 1.075) / 25) * 25;
 
-  // Fats: ~0.85 g/kg for hormonal health; remainder to carbohydrates (timed peri-workout)
   const fatG = Math.round(bw * 0.85);
   const carbG = Math.max(120, Math.round((targetKcal - proteinTargetG * 4 - fatG * 9) / 4));
-  const periWorkoutCarbG = Math.round(carbG * 0.65);
-
-  const weeklyGainMinKg = (bw * 0.0025).toFixed(2);
-  const weeklyGainMaxKg = (bw * 0.0038).toFixed(2);
+  const periCarbG = Math.round(carbG * 0.65);
 
   return {
-    bw,
-    bmi,
-    mode,
-    proteinFloorG,
-    proteinTargetG,
-    proteinCeilingG,
-    perMealG,
-    actualGPerKg,
-    leucinePerMealG,
-    maintenanceKcal,
-    targetKcal,
-    fatG,
-    carbG,
-    periWorkoutCarbG,
-    weeklyGainMinKg,
-    weeklyGainMaxKg
+    bw, bmi, mode,
+    proteinFloorG, proteinTargetG, proteinCeilingG,
+    perMealG, actualGPerKg, leucinePerMealG,
+    maintenanceKcal, targetKcal, fatG, carbG, periCarbG,
+    gainMin: (bw * 0.0025).toFixed(2),
+    gainMax: (bw * 0.0038).toFixed(2)
   };
 }
 
 function getDayNutritionEntry(weekNum, dayIndex) {
   const key = `w${weekNum}_d${dayIndex}`;
   const entry = state.nutritionLog[key];
-  if (!entry) {
-    return { meals: [false, false, false, false], extraG: 0, creatine: false };
-  }
+  if (!entry) return { meals: [false, false, false, false], extraG: 0, creatine: false };
   return {
     meals: Array.isArray(entry.meals) ? [...entry.meals] : [false, false, false, false],
     extraG: typeof entry.extraG === "number" ? entry.extraG : 0,
@@ -195,29 +175,40 @@ function setDayNutritionEntry(weekNum, dayIndex, entry) {
 }
 
 function getDayProteinConsumed(weekNum, dayIndex) {
-  const targets = getNutritionTargets();
+  const t = getNutritionTargets();
   const entry = getDayNutritionEntry(weekNum, dayIndex);
   const checkedMeals = entry.meals.filter(Boolean).length;
-  return Math.max(0, checkedMeals * targets.perMealG + entry.extraG);
+  return Math.max(0, checkedMeals * t.perMealG + entry.extraG);
 }
 
-// Parse dynamic set counts (supports both "4 sets of 4 reps" and "4 x 4")
+// Find most recent previous week log for an exercise (Double Progression reference)
+function getPreviousExerciseLog(weekNum, exId) {
+  for (let w = weekNum - 1; w >= 1; w--) {
+    const log = state.exerciseLogs[`w${w}_${exId}`];
+    if (log && (log.kg || log.reps)) {
+      return { week: w, kg: log.kg || "", reps: log.reps || "" };
+    }
+  }
+  return null;
+}
+
+// Dynamic set count & prescription
 function getEffectiveSetsCount(exercise, weekObj) {
   if (exercise.dynamicKey === "upperA_pullup") {
-    const match = weekObj.pullUpScheme.match(/^(\d+)\s*(?:sets|x)/i);
-    return match ? parseInt(match[1], 10) : exercise.defaultSets;
+    const m = weekObj.pullUpScheme.match(/^(\d+)/);
+    return m ? parseInt(m[1], 10) : exercise.defaultSets;
   }
   if (exercise.dynamicKey === "upperA_dip") {
-    const match = weekObj.dipScheme.match(/^(\d+)\s*(?:sets|x)/i);
-    return match ? parseInt(match[1], 10) : exercise.defaultSets;
+    const m = weekObj.dipScheme.match(/^(\d+)/);
+    return m ? parseInt(m[1], 10) : exercise.defaultSets;
   }
   if (exercise.dynamicKey === "upperB_volPullup") {
-    const match = weekObj.volPullUps.match(/^(\d+)\s*(?:sets|x)/i);
-    return match ? parseInt(match[1], 10) : exercise.defaultSets;
+    const m = weekObj.volPullUps.match(/^(\d+)/);
+    return m ? parseInt(m[1], 10) : exercise.defaultSets;
   }
   if (exercise.dynamicKey === "thu_muscleup") {
-    const match = weekObj.muscleUpDrill.match(/(\d+)\s*sets/i);
-    return match ? parseInt(match[1], 10) : exercise.defaultSets;
+    const m = weekObj.muscleUpDrill.match(/(\d+)\s*×/);
+    return m ? parseInt(m[1], 10) : exercise.defaultSets;
   }
   if (weekObj.blockType === "DELOAD" && exercise.defaultSets >= 3) {
     return Math.max(2, exercise.defaultSets - 1);
@@ -225,25 +216,28 @@ function getEffectiveSetsCount(exercise, weekObj) {
   return exercise.defaultSets;
 }
 
-// Plain-English dynamic prescription string
-function getDynamicPrescription(exercise, weekObj) {
+function getExerciseSpecLine(exercise, weekObj) {
+  const numSets = getEffectiveSetsCount(exercise, weekObj);
+  const restText = exercise.restSeconds > 0 ? ` · ${exercise.restSeconds}s rest` : "";
+
   if (exercise.dynamicKey === "upperA_pullup") {
-    return `+${weekObj.pullUpLoad}kg · ${weekObj.pullUpScheme}`;
+    return `<strong>+${weekObj.pullUpLoad} kg · ${weekObj.pullUpScheme}</strong> · ${weekObj.rirTarget}${restText}`;
   }
   if (exercise.dynamicKey === "upperA_dip") {
-    const load = weekObj.dipLoad > 0 ? `+${weekObj.dipLoad}kg` : "Bodyweight (0kg)";
-    return `${load} · ${weekObj.dipScheme}`;
+    const load = weekObj.dipLoad > 0 ? `+${weekObj.dipLoad} kg` : "BW";
+    return `<strong>${load} · ${weekObj.dipScheme}</strong> · ${weekObj.rirTarget}${restText}`;
   }
   if (exercise.dynamicKey === "upperB_volPullup") {
-    return weekObj.volPullUps;
+    return `<strong>${weekObj.volPullUps}</strong> · ${weekObj.rirTarget}${restText}`;
   }
   if (exercise.dynamicKey === "thu_muscleup") {
-    return weekObj.muscleUpDrill;
+    return `<strong>${weekObj.muscleUpDrill}</strong>${restText}`;
   }
   if (exercise.dynamicKey === "thu_treadmill") {
-    return weekObj.qualityRun;
+    return `<strong>${weekObj.qualityRun}</strong> · 5m WU + 4m CD`;
   }
-  return `${exercise.setsLabel} of ${exercise.repsLabel}`;
+  const rirPart = exercise.loggable ? ` · ${weekObj.rirTarget}` : "";
+  return `<strong>${numSets} × ${exercise.reps}</strong>${rirPart}${restText}`;
 }
 
 function getDayCompletion(weekNum, dayIndex) {
@@ -253,448 +247,397 @@ function getDayCompletion(weekNum, dayIndex) {
   let completedSets = 0;
 
   dayObj.exercises.forEach(ex => {
-    const numSets = getEffectiveSetsCount(ex, weekObj);
-    for (let s = 0; s < numSets; s++) {
+    const n = getEffectiveSetsCount(ex, weekObj);
+    for (let s = 0; s < n; s++) {
       totalSets++;
-      if (state.setChecks[`w${weekNum}_d${dayIndex}_${ex.id}_s${s}`]) {
-        completedSets++;
-      }
+      if (state.setChecks[`w${weekNum}_d${dayIndex}_${ex.id}_s${s}`]) completedSets++;
     }
   });
 
   const pct = totalSets === 0 ? 0 : Math.round((completedSets / totalSets) * 100);
-  return {
-    totalSets,
-    completedSets,
-    pct,
-    isComplete: totalSets > 0 && completedSets === totalSets
-  };
+  return { totalSets, completedSets, pct, isComplete: totalSets > 0 && completedSets === totalSets };
 }
 
-// Render Daily Protein & Creatine Card on Mode 01
-function renderDailyProteinCard() {
-  const targets = getNutritionTargets();
+// Render Compact Protein Strip (Tab 1)
+function renderProteinStrip() {
+  const t = getNutritionTargets();
   const entry = getDayNutritionEntry(state.currentWeek, state.currentDayIndex);
   const consumed = getDayProteinConsumed(state.currentWeek, state.currentDayIndex);
-  const pct = Math.min(100, Math.round((consumed / targets.proteinTargetG) * 100));
-  const floorPct = Math.min(95, Math.round((targets.proteinFloorG / targets.proteinTargetG) * 100));
+  const pct = Math.min(100, Math.round((consumed / t.proteinTargetG) * 100));
+  const floorPct = Math.min(95, Math.round((t.proteinFloorG / t.proteinTargetG) * 100));
 
-  const modeLabel = targets.mode === "recomp" ? "RECOMP" : "LEAN BULK";
-  document.getElementById("ptModeEyebrow").textContent =
-    `DAILY PROTEIN GOAL · ${targets.actualGPerKg} g/kg (${modeLabel})`;
+  const card = document.getElementById("proteinTrackerCard");
+  card.classList.toggle("hit-target", consumed >= t.proteinTargetG);
+
   document.getElementById("ptCurrentVal").textContent = `${consumed}g`;
-  document.getElementById("ptTargetVal").textContent = `${targets.proteinTargetG}g`;
+  document.getElementById("ptTargetVal").textContent = `/ ${t.proteinTargetG}g`;
 
-  const cardEl = document.getElementById("proteinTrackerCard");
   const statusEl = document.getElementById("ptStatusPill");
-
-  cardEl.classList.remove("hit-floor", "hit-target");
-  if (consumed >= targets.proteinTargetG) {
-    cardEl.classList.add("hit-target");
-    statusEl.textContent = "Target Hit ✓";
-  } else if (consumed >= targets.proteinFloorG) {
-    cardEl.classList.add("hit-floor");
-    statusEl.textContent = `Above 1.6 g/kg Floor (+${targets.proteinTargetG - consumed}g to goal)`;
+  if (consumed >= t.proteinTargetG) {
+    statusEl.textContent = "Target hit ✓";
+  } else if (consumed >= t.proteinFloorG) {
+    statusEl.textContent = `Above 1.6g/kg floor`;
   } else {
-    statusEl.textContent = `${targets.proteinTargetG - consumed}g left · Floor ${targets.proteinFloorG}g`;
+    statusEl.textContent = `Floor ${t.proteinFloorG}g`;
   }
 
   document.getElementById("ptBarFill").style.width = `${pct}%`;
   document.getElementById("ptFloorMarker").style.left = `${floorPct}%`;
-  document.getElementById("ptFloorLabel").textContent = `${targets.proteinFloorG}g Floor (1.6 g/kg)`;
-  document.getElementById("ptCeilingLabel").textContent = `${targets.proteinTargetG}g Goal`;
 
-  // 4 One-Tap Meal Bolus Chips
-  const mealsGrid = document.getElementById("ptMealsGrid");
-  mealsGrid.innerHTML = PLAN_DATA.mealSlots.map((slot, idx) => {
-    const isChecked = !!entry.meals[idx];
+  const crBtn = document.getElementById("creatineToggleBtn");
+  crBtn.classList.toggle("active", entry.creatine);
+  crBtn.textContent = entry.creatine ? "5g Creatine ✓" : "5g Creatine";
+
+  const mealsEl = document.getElementById("ptMealsGrid");
+  mealsEl.innerHTML = PLAN_DATA.mealSlots.map((slot, idx) => {
+    const checked = !!entry.meals[idx];
     return `
-      <button class="pt-meal-btn ${isChecked ? "checked" : ""}" data-meal-idx="${idx}" title="${slot.timing}">
-        <span class="ptm-top">${slot.short} · ${isChecked ? "✓" : `${targets.perMealG}g`}</span>
-        <span class="ptm-lbl">${slot.label}</span>
+      <button class="meal-chip ${checked ? "checked" : ""}" data-meal-idx="${idx}" title="${slot.timing}">
+        <span class="mc-top">${slot.short} · ${checked ? "✓" : `${t.perMealG}g`}</span>
+        <span class="mc-sub">${slot.label}</span>
       </button>
     `;
   }).join("");
 
-  mealsGrid.querySelectorAll(".pt-meal-btn").forEach(btn => {
+  mealsEl.querySelectorAll(".meal-chip").forEach(btn => {
     btn.addEventListener("click", () => {
       const idx = parseInt(btn.dataset.mealIdx, 10);
       const cur = getDayNutritionEntry(state.currentWeek, state.currentDayIndex);
       cur.meals[idx] = !cur.meals[idx];
       setDayNutritionEntry(state.currentWeek, state.currentDayIndex, cur);
-      renderDailyProteinCard();
-      renderGeneticsAndMatrix();
+      renderProteinStrip();
+      renderPlanTab();
     });
   });
-
-  // Creatine Toggle
-  const crBtn = document.getElementById("creatineToggleBtn");
-  crBtn.classList.toggle("active", entry.creatine);
-  crBtn.innerHTML = entry.creatine
-    ? `<span class="cr-dot"></span> 5g Creatine ✓`
-    : `<span class="cr-dot"></span> 5g Creatine`;
 }
 
-// Render Mode 01: Today's 60-Min Workout Canvas
-function renderWorkoutCanvas() {
+// Render Tab 1: Workout
+function renderWorkoutTab() {
   const weekObj = PLAN_DATA.weeks.find(w => w.week === state.currentWeek);
   const dayObj = PLAN_DATA.daysTemplate[state.currentDayIndex];
   const currentDate = addDays(weekObj.startDate, dayObj.dayIndex);
-  const currentIso = dateToIsoUtc(currentDate);
   const todayIso = getLocalIsoDate();
-  const isToday = currentIso === todayIso;
-  const dayComp = getDayCompletion(state.currentWeek, state.currentDayIndex);
+  const isToday = dateToIsoUtc(currentDate) === todayIso;
+  const comp = getDayCompletion(state.currentWeek, state.currentDayIndex);
 
-  // 1. Top Dial & Phase Tag
-  const wkPadded = String(weekObj.week).padStart(2, "0");
-  document.getElementById("weekDialText").textContent = `WEEK ${wkPadded} / 26`;
-  document.getElementById("phaseTagText").textContent = `${weekObj.phase.toUpperCase()} · ${weekObj.blockType.toUpperCase()}`;
+  // Header
+  document.getElementById("weekDialText").textContent = `Week ${weekObj.week} / 26`;
+  document.getElementById("phaseTagText").textContent = `${weekObj.phase} · ${weekObj.rirTarget}`;
 
-  // 2. Editorial Poster Stage
-  document.getElementById("posterDateLine").textContent = formatEditorialDate(currentDate, dayObj.dayName);
-  document.getElementById("todayBadge").classList.toggle("hidden", !isToday);
-  document.getElementById("durationCapsule").textContent = `⏱ ${dayObj.estimatedMinutes} MIN SESSION`;
-  document.getElementById("posterTitle").textContent = dayObj.sessionTitle;
-
-  const dynamicFocusByDay = {
-    0: `Paired A1/A2: Pull-Up +${weekObj.pullUpLoad}kg (${weekObj.pullUpScheme}) & Dip +${weekObj.dipLoad}kg (${weekObj.dipScheme})`,
-    1: dayObj.focus,
-    2: dayObj.focus,
-    3: `${weekObj.muscleUpDrill} · Volume Pull-Ups (${weekObj.volPullUps}) & Stretch Hypertrophy`,
-    4: dayObj.focus,
-    5: `Weak-Point Frame (Upper Chest, 4× Laterals, Arms) + ${weekObj.qualityRun}`,
-    6: dayObj.focus
-  };
-  document.getElementById("posterFocusNote").textContent = dynamicFocusByDay[dayObj.dayIndex];
-  document.getElementById("timeBreakdownText").textContent = dayObj.timeBreakdown;
-
-  // Sculptural Ring
-  const ringCircumference = 263.9;
-  const ringOffset = ringCircumference - (dayComp.pct / 100) * ringCircumference;
-  document.getElementById("sculptureRingBar").style.strokeDashoffset = ringOffset;
-  document.getElementById("sculptureDayNum").textContent = currentDate.getUTCDate();
-  document.getElementById("sculpturePctText").textContent = dayComp.isComplete ? "DONE ✓" : `${dayComp.pct}%`;
-
-  const sculptureEl = document.getElementById("posterCompleteTrigger");
-  sculptureEl.classList.toggle("complete", dayComp.isComplete);
-
-  // Plain-English Decoder Drawer
-  const decoderBox = document.getElementById("decoderBox");
-  const decoderBtn = document.getElementById("toggleDecoderBtn");
-  decoderBox.classList.toggle("hidden", !state.decoderOpen);
-  decoderBtn.classList.toggle("active", state.decoderOpen);
-  decoderBtn.textContent = state.decoderOpen ? "Hide Guide ✕" : "Guide & Terms";
-
-  document.getElementById("decoderGrid").innerHTML = PLAN_DATA.decoder.map(d => `
-    <div class="decoder-item">
-      <div class="dec-term">${d.term}</div>
-      <div class="dec-plain">${d.plain}</div>
-    </div>
-  `).join("");
-
-  // 3. 7-Day Tactile Ribbon (SAT SUN MON TUE WED THU FRI)
+  // 7-Day Strip
   const ribbonEl = document.getElementById("dayRibbon");
   ribbonEl.innerHTML = PLAN_DATA.daysTemplate.map((d, idx) => {
     const dt = addDays(weekObj.startDate, idx);
     const dtIso = dateToIsoUtc(dt);
-    const comp = getDayCompletion(state.currentWeek, idx);
-    const isActive = idx === state.currentDayIndex;
-    const pillIsToday = dtIso === todayIso;
+    const dComp = getDayCompletion(state.currentWeek, idx);
+    const active = idx === state.currentDayIndex;
+    const todayMatch = dtIso === todayIso;
     return `
-      <button class="ribbon-pill ${isActive ? "active" : ""} ${comp.isComplete ? "done" : ""} ${pillIsToday ? "is-today" : ""}" data-didx="${idx}">
-        <span class="r-day-let">${d.shortName}</span>
-        <span class="r-day-num">${dt.getUTCDate()}</span>
-        <span class="r-pip"></span>
+      <button class="day-pill ${active ? "active" : ""} ${dComp.isComplete ? "done" : ""} ${todayMatch ? "is-today" : ""}" data-didx="${idx}">
+        <span class="dp-dow">${d.letter}</span>
+        <span class="dp-num">${dt.getUTCDate()}</span>
+        <span class="dp-dot"></span>
       </button>
     `;
   }).join("");
 
-  ribbonEl.querySelectorAll(".ribbon-pill").forEach(btn => {
+  ribbonEl.querySelectorAll(".day-pill").forEach(btn => {
     btn.addEventListener("click", () => {
       state.currentDayIndex = parseInt(btn.dataset.didx, 10);
       saveState();
-      renderWorkoutCanvas();
+      renderWorkoutTab();
     });
   });
 
-  // 4. Daily Protein & Creatine Card
-  renderDailyProteinCard();
+  // Session Head
+  document.getElementById("posterDateLine").textContent = formatDateHeading(currentDate, dayObj.dayName);
+  document.getElementById("todayBadge").classList.toggle("hidden", !isToday);
+  document.getElementById("durationCapsule").textContent =
+    `${dayObj.estimatedMinutes} min · ${comp.completedSets}/${comp.totalSets} sets`;
+  document.getElementById("posterTitle").textContent = dayObj.sessionTitle;
+  document.getElementById("posterFocusNote").textContent = dayObj.summary;
 
-  // 5. Interactive Movement Deck
+  const fillEl = document.getElementById("sessionProgressFill");
+  fillEl.style.width = `${comp.pct}%`;
+  fillEl.classList.toggle("complete", comp.isComplete);
+  document.getElementById("markAllDoneBtn").textContent = comp.isComplete ? "Unmark" : "Mark all";
+
+  // Protein Strip
+  renderProteinStrip();
+
+  // Exercise List
   const deckEl = document.getElementById("movementDeck");
-  deckEl.innerHTML = dayObj.exercises.map((ex, idx) => {
+  deckEl.innerHTML = dayObj.exercises.map(ex => {
     const numSets = getEffectiveSetsCount(ex, weekObj);
-    const prescription = getDynamicPrescription(ex, weekObj);
-    const watermarkNum = String(idx + 1).padStart(2, "0");
-    const isSkillPrimer = ex.dynamicKey === "thu_muscleup";
-
     let doneSets = 0;
-    const orbsHtml = [];
+    const setBtns = [];
     for (let s = 0; s < numSets; s++) {
       const k = `w${state.currentWeek}_d${state.currentDayIndex}_${ex.id}_s${s}`;
-      const isStamped = !!state.setChecks[k];
-      if (isStamped) doneSets++;
-      orbsHtml.push(`
-        <button class="set-orb ${isStamped ? "stamped" : ""}" data-key="${k}" data-rest="${ex.restSeconds}">
-          <span class="orb-num">${isStamped ? "✓" : s + 1}</span>
-          <span class="orb-sub">${isStamped ? "DONE" : "SET"}</span>
+      const checked = !!state.setChecks[k];
+      if (checked) doneSets++;
+      setBtns.push(`
+        <button class="set-circle ${checked ? "checked" : ""}" data-key="${k}" data-rest="${ex.restSeconds}" aria-label="Set ${s + 1}">
+          ${checked ? "✓" : s + 1}
         </button>
       `);
     }
 
-    const isCardComplete = numSets > 0 && doneSets === numSets;
-    const isBlueprintOpen = !!state.openBlueprints[ex.id];
+    const cardComplete = numSets > 0 && doneSets === numSets;
+    const isFormOpen = !!state.openForms[ex.id];
+    const logKey = `w${state.currentWeek}_${ex.id}`;
+    const curLog = state.exerciseLogs[logKey] || { kg: "", reps: "" };
+    const prevLog = ex.loggable ? getPreviousExerciseLog(state.currentWeek, ex.id) : null;
+    const prevText = prevLog
+      ? `Prev W${prevLog.week}: ${prevLog.kg ? `${prevLog.kg}kg` : "BW"} × ${prevLog.reps || "—"}`
+      : "Double progression log";
+
+    const logbookHtml = ex.loggable ? `
+      <div class="logbook-wrap">
+        <div class="logbook-inputs">
+          <input type="text" inputmode="decimal" class="log-input" data-log-key="${logKey}" data-field="kg" value="${curLog.kg}" placeholder="kg" aria-label="Weight in kg" />
+          <span class="log-x">×</span>
+          <input type="text" inputmode="numeric" class="log-input" data-log-key="${logKey}" data-field="reps" value="${curLog.reps}" placeholder="reps" aria-label="Reps completed" />
+        </div>
+        <span class="prev-hint">${prevText}</span>
+      </div>
+    ` : "";
+
+    const lengthenedHint = ex.lengthened
+      ? `<div class="fd-line"><strong>Stretch bonus:</strong> On your final set, add 2–3 controlled lengthened partials in the bottom half (Wolf 2023).</div>`
+      : "";
 
     return `
-      <article class="deck-card ${isSkillPrimer ? "skill-primer-card" : ""} ${isCardComplete ? "card-complete" : ""}">
-        <div class="deck-watermark">${watermarkNum}</div>
-
-        <div class="deck-top">
-          <span class="deck-cat-tag">${ex.category}</span>
-          <h2 class="deck-title">${ex.name}</h2>
-        </div>
-
-        <div class="deck-prescription-row">
-          <span class="deck-spec-pill highlight">${prescription}</span>
-          <span class="deck-spec-pill">${ex.rir}</span>
-          ${ex.restSeconds > 0 ? `<span class="deck-spec-pill">${ex.restSeconds}s rest</span>` : ""}
-        </div>
-
-        <div class="orbs-row">
-          <div class="orbs-cluster">
-            ${orbsHtml.join("")}
+      <article class="ex-card ${ex.isSkill ? "skill-card" : ""} ${cardComplete ? "complete" : ""}">
+        <div class="ex-head">
+          <div class="ex-title-wrap">
+            <span class="pair-tag">${ex.pair}</span>
+            <h2 class="ex-name">${ex.name}</h2>
           </div>
-          <button class="cue-toggle-btn ${isBlueprintOpen ? "open" : ""}" data-bp="${ex.id}">
-            ${isBlueprintOpen ? "Hide Form" : "Form Guide"}
+          <button class="text-action form-toggle" data-ex-id="${ex.id}">
+            ${isFormOpen ? "Hide" : "Form"}
           </button>
         </div>
 
-        <div class="inline-blueprint ${isBlueprintOpen ? "open" : ""}">
-          <div class="bp-cue-highlight">“${ex.cues}”</div>
-          <div style="margin-bottom:6px;font-weight:800;font-size:0.74rem;letter-spacing:0.04em;">
-            TARGET MUSCLES: ${ex.guideDetails.muscles.toUpperCase()}
-          </div>
-          <ol class="bp-steps">
-            ${ex.guideDetails.execution.map(step => `<li>${step}</li>`).join("")}
-          </ol>
-          <div class="bp-avoid">
-            Avoid: ${ex.guideDetails.mistakeToAvoid}
-          </div>
+        <div class="ex-spec">${getExerciseSpecLine(ex, weekObj)}</div>
+
+        <div class="ex-controls">
+          <div class="sets-row">${setBtns.join("")}</div>
+          ${logbookHtml}
+        </div>
+
+        <div class="form-drawer ${isFormOpen ? "open" : ""}">
+          <div class="fd-line"><strong>Target:</strong> ${ex.muscles}</div>
+          <div class="fd-line"><strong>Cue:</strong> ${ex.cues}</div>
+          ${lengthenedHint}
+          <div class="fd-avoid">Avoid: ${ex.avoid}</div>
         </div>
       </article>
     `;
   }).join("");
 
-  // Bind Set Orbs
-  deckEl.querySelectorAll(".set-orb").forEach(orb => {
-    orb.addEventListener("click", () => {
-      const k = orb.dataset.key;
-      const restSec = parseInt(orb.dataset.rest, 10);
+  // Bind Set Circles
+  deckEl.querySelectorAll(".set-circle").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const k = btn.dataset.key;
+      const restSec = parseInt(btn.dataset.rest, 10);
       if (state.setChecks[k]) {
         delete state.setChecks[k];
       } else {
         state.setChecks[k] = true;
-        if (restSec > 0) startRestPill(restSec);
+        if (restSec > 0) startRestBar(restSec);
       }
       saveState();
-      renderWorkoutCanvas();
+      renderWorkoutTab();
+      renderPlanTab();
     });
   });
 
-  // Bind Inline Form Guide Accordion Buttons
-  deckEl.querySelectorAll(".cue-toggle-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const exId = btn.dataset.bp;
-      state.openBlueprints[exId] = !state.openBlueprints[exId];
+  // Bind Inline Logbook Inputs
+  deckEl.querySelectorAll(".log-input").forEach(inp => {
+    inp.addEventListener("input", e => {
+      const lk = e.target.dataset.logKey;
+      const field = e.target.dataset.field;
+      if (!state.exerciseLogs[lk]) state.exerciseLogs[lk] = { kg: "", reps: "" };
+      state.exerciseLogs[lk][field] = e.target.value;
       saveState();
-      renderWorkoutCanvas();
     });
   });
 
-  // 6. Analog Field Note
+  // Bind Form Toggle
+  deckEl.querySelectorAll(".form-toggle").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.exId;
+      state.openForms[id] = !state.openForms[id];
+      saveState();
+      renderWorkoutTab();
+    });
+  });
+
+  // Session Note
   const noteKey = `w${state.currentWeek}_d${state.currentDayIndex}`;
   document.getElementById("dailyNoteInput").value = state.dayNotes[noteKey] || "";
 }
 
-// Render Mode 02: Muscle-Up Mastery Lab
-function renderMuscleUpLab() {
-  const weekObj = PLAN_DATA.weeks.find(w => w.week === state.currentWeek);
-  document.getElementById("muCurrentWeekBadge").textContent = `WEEK ${weekObj.week} PRESCRIPTION`;
-  document.getElementById("muActiveDrillBox").innerHTML = `
-    <div style="font-size:0.68rem;font-weight:800;letter-spacing:0.08em;color:#fbbf24;margin-bottom:2px;">
-      THIS TUESDAY'S FRESH SKILL PRIMER (9 MINS)
-    </div>
-    <div style="font-weight:800;font-size:0.95rem;color:#fff;">
-      ${weekObj.muscleUpDrill}
-    </div>
-  `;
-
-  const stackEl = document.getElementById("muStagesStack");
-  stackEl.innerHTML = PLAN_DATA.muscleUpStages.map(st => {
-    const isUnlocked = !!state.unlockedMuStages[st.stage];
-    return `
-      <div class="mu-stage-card ${isUnlocked ? "unlocked" : ""}" data-stage="${st.stage}">
-        <div class="mus-top">
-          <span class="mus-pill">STAGE 0${st.stage} · ${st.weeks.toUpperCase()}</span>
-          <span class="mus-check">${isUnlocked ? "MASTERED ✓" : "TAP WHEN MASTERED ○"}</span>
-        </div>
-        <h3 style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;margin-bottom:4px;">
-          ${st.title}
-        </h3>
-        <div style="font-size:0.78rem;font-weight:800;color:var(--clay-orange);margin-bottom:8px;">
-          Goal: ${st.target}
-        </div>
-        <p style="font-size:0.81rem;color:var(--ink-mid);margin-bottom:8px;">
-          ${st.cue}
-        </p>
-        <div style="font-size:0.75rem;font-weight:700;background:rgba(22,21,20,0.05);padding:7px 10px;border-radius:10px;">
-          Tuesday Drill: ${st.drill}
-        </div>
-      </div>
-    `;
-  }).join("");
-
-  stackEl.querySelectorAll(".mu-stage-card").forEach(card => {
-    card.addEventListener("click", () => {
-      const s = card.dataset.stage;
-      state.unlockedMuStages[s] = !state.unlockedMuStages[s];
-      saveState();
-      renderMuscleUpLab();
-    });
-  });
-}
-
-// Render Mode 03: Protein, South Asian Physiology, Volume Audit, Citations & 26W Matrix
-function renderGeneticsAndMatrix() {
+// Render Tab 2: Nutrition
+function renderNutritionTab() {
   const t = getNutritionTargets();
 
-  // 1. Bodyweight & Goal Mode Dial
   document.getElementById("bwDisplayVal").textContent = `${t.bw} kg`;
   document.getElementById("bmiSubText").textContent =
-    `BMI ${t.bmi} · South Asian Thin-Fat / Hardgainer Calibration`;
+    `${PLAN_DATA.meta.heightLabel} · BMI ${t.bmi} · South Asian Calibration`;
 
   document.getElementById("goalRecompBtn").classList.toggle("active", t.mode === "recomp");
   document.getElementById("goalBulkBtn").classList.toggle("active", t.mode === "leanbulk");
 
   document.getElementById("macroSummaryGrid").innerHTML = `
-    <div class="macro-box primary">
-      <span class="mb-kicker">DAILY PROTEIN</span>
-      <strong class="mb-val">${t.proteinTargetG}g</strong>
-      <span class="mb-sub">${t.actualGPerKg} g/kg · 4×${t.perMealG}g</span>
+    <div class="stat-box">
+      <span class="sb-label">Protein</span>
+      <strong class="sb-val">${t.proteinTargetG}g</strong>
+      <span class="sb-sub">${t.actualGPerKg} g/kg</span>
     </div>
-    <div class="macro-box">
-      <span class="mb-kicker">DAILY CALORIES</span>
-      <strong class="mb-val">${t.targetKcal}</strong>
-      <span class="mb-sub">${t.mode === "recomp" ? "Maintenance Recomp" : "+7.5% Lean Surplus"}</span>
+    <div class="stat-box">
+      <span class="sb-label">Calories</span>
+      <strong class="sb-val">${t.targetKcal}</strong>
+      <span class="sb-sub">${t.mode === "recomp" ? "Maintenance" : "+7.5% surplus"}</span>
     </div>
-    <div class="macro-box">
-      <span class="mb-kicker">CARBS / FATS</span>
-      <strong class="mb-val">${t.carbG}g / ${t.fatG}g</strong>
-      <span class="mb-sub">~${t.periWorkoutCarbG}g Pre/Post Gym</span>
+    <div class="stat-box">
+      <span class="sb-label">Carbs / Fat</span>
+      <strong class="sb-val">${t.carbG} / ${t.fatG}g</strong>
+      <span class="sb-sub">~${t.periCarbG}g peri-gym</span>
     </div>
   `;
 
-  const gainGuidance = t.mode === "recomp"
-    ? "Hold scale weight steady (±0.2 kg) while waist shrinks & lifts rise (Barakat 2020)"
-    : `Gain +${t.weeklyGainMinKg}–${t.weeklyGainMaxKg} kg/wk (0.25–0.38% BW/wk; Helms 2023)`;
+  const scaleText = t.mode === "recomp"
+    ? "Hold weight steady while waist drops & lifts climb"
+    : `+${t.gainMin}–${t.gainMax} kg/wk (Helms 2023)`;
 
   document.getElementById("fdLandmarks").innerHTML = `
-    <div class="fd-item highlight-row">
-      <div>
-        <strong style="color:var(--clay-orange);display:block;">Your Optimal Protein Target (${t.actualGPerKg} g/kg) ★</strong>
-        <span style="font-size:0.74rem;color:var(--ink-mid);">4 meals × ${t.perMealG}g (~${t.leucinePerMealG}g leucine/meal · Schoenfeld &amp; Aragon 2018)</span>
-      </div>
-      <strong style="font-family:'Syne',sans-serif;font-size:1.12rem;color:var(--clay-orange);">${t.proteinTargetG} g/day</strong>
+    <div class="kv-row">
+      <span class="kv-k">Per-meal target (4 meals)</span>
+      <span class="kv-v">${t.perMealG}g (~${t.leucinePerMealG}g leucine)</span>
     </div>
-    <div class="fd-item">
-      <span>Evidence-Based Hypertrophy Floor (Morton 2018 · 1.6 g/kg)</span>
-      <strong style="font-family:'Syne',sans-serif;">${t.proteinFloorG} g/day</strong>
+    <div class="kv-row">
+      <span class="kv-k">Minimum floor (Morton 2018 · 1.6 g/kg)</span>
+      <span class="kv-v">${t.proteinFloorG} g/day</span>
     </div>
-    <div class="fd-item">
-      <span>Morton 95% CI Upper Ceiling (2.2 g/kg)</span>
-      <strong style="font-family:'Syne',sans-serif;">${t.proteinCeilingG} g/day</strong>
+    <div class="kv-row">
+      <span class="kv-k">Upper CI ceiling (2.2 g/kg)</span>
+      <span class="kv-v">${t.proteinCeilingG} g/day</span>
     </div>
-    <div class="fd-item">
-      <span>Scale Trend Target</span>
-      <strong style="text-align:right;max-width:58%;font-size:0.78rem;">${gainGuidance}</strong>
+    <div class="kv-row">
+      <span class="kv-k">Daily creatine (Kreider 2017)</span>
+      <span class="kv-v">5g Monohydrate</span>
     </div>
-    <div class="fd-item">
-      <span>Daily Strength &amp; Fullness Buffer (Kreider 2017)</span>
-      <strong style="color:var(--forest-ink);">5g Creatine Monohydrate</strong>
+    <div class="kv-row">
+      <span class="kv-k">Weekly scale target</span>
+      <span class="kv-v">${scaleText}</span>
     </div>
   `;
 
-  // 2. South Asian 40g Protein Meal Ideas
   document.getElementById("mealIdeasGrid").innerHTML = PLAN_DATA.southAsianMeals.map(m => `
-    <div class="meal-idea-card">
-      <div class="mi-tag">${m.tag}</div>
-      <div class="mi-title">${m.title}</div>
-      <div class="mi-macros">${m.macros}</div>
-      <div class="mi-detail">${m.detail}</div>
-    </div>
-  `).join("");
-
-  // 3. Weekly Hypertrophy Volume Audit
-  document.getElementById("volumeAuditGrid").innerHTML = PLAN_DATA.weeklyVolumeAudit.map(v => `
-    <div class="vol-row">
-      <div class="vol-top">
-        <span class="vol-muscle">${v.muscle}</span>
-        <span class="vol-meta">${v.sets} · <strong>${v.freq}</strong></span>
+    <div class="list-item">
+      <div class="li-top">
+        <span class="li-title">${m.title}</span>
+        <span class="li-meta">${m.tag}</span>
       </div>
-      <div class="vol-bar-track">
-        <div class="vol-bar-fill" style="width:${v.pct}%"></div>
-      </div>
+      <div class="li-sub">${m.detail}</div>
+      <div class="li-accent">${m.macros}</div>
     </div>
   `).join("");
 
-  // 4. South Asian Physiology Manifesto
-  const sa = PLAN_DATA.southAsianProtocol;
-  document.getElementById("saHeadline").textContent = sa.headline;
-  document.getElementById("saSummary").textContent = sa.summary;
-  document.getElementById("saPillarsGrid").innerHTML = sa.pillars.map(p => `
-    <div class="gm-pillar-box">
-      <div class="gmp-badge">${p.badge}</div>
-      <div class="gmp-title">${p.title}</div>
-      <div class="gmp-detail">${p.detail}</div>
-    </div>
-  `).join("");
-
-  // 5. Peer-Reviewed Research Library
   document.getElementById("researchStack").innerHTML = PLAN_DATA.researchCitations.map(r => `
-    <div class="research-item">
-      <div class="res-study">${r.study}</div>
-      <div class="res-finding">${r.finding}</div>
-      <div class="res-apply">In your plan: ${r.application}</div>
+    <div class="list-item">
+      <div class="li-title" style="margin-bottom:2px;">${r.study}</div>
+      <div class="li-sub">${r.finding}</div>
+      <div class="li-accent">${r.application}</div>
+    </div>
+  `).join("");
+}
+
+// Render Tab 3: 26W Plan
+function renderPlanTab() {
+  const weekObj = PLAN_DATA.weeks.find(w => w.week === state.currentWeek);
+  const t = getNutritionTargets();
+
+  // Muscle-Up Pathway
+  document.getElementById("muCurrentWeekBadge").textContent = `Week ${weekObj.week}`;
+  document.getElementById("muActiveLine").textContent = `Tuesday drill: ${weekObj.muscleUpDrill}`;
+
+  const muEl = document.getElementById("muStagesStack");
+  muEl.innerHTML = PLAN_DATA.muscleUpStages.map(st => {
+    const unlocked = !!state.unlockedMuStages[st.stage];
+    return `
+      <div class="list-item mu-item ${unlocked ? "unlocked" : ""}" data-stage="${st.stage}">
+        <span class="mu-check-dot">✓</span>
+        <div style="flex:1;">
+          <div class="li-top">
+            <span class="li-title">${st.stage}. ${st.title}</span>
+            <span class="li-meta">${st.weeks}</span>
+          </div>
+          <div class="li-sub">${st.target} — ${st.cue}</div>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  muEl.querySelectorAll(".mu-item").forEach(item => {
+    item.addEventListener("click", () => {
+      const s = item.dataset.stage;
+      state.unlockedMuStages[s] = !state.unlockedMuStages[s];
+      saveState();
+      renderPlanTab();
+    });
+  });
+
+  // Weekly Volume Audit
+  document.getElementById("volumeAuditGrid").innerHTML = PLAN_DATA.weeklyVolumeAudit.map(v => `
+    <div>
+      <div class="vol-row-top">
+        <span class="vol-name">${v.muscle}</span>
+        <span class="vol-meta">${v.sets} · ${v.freq}</span>
+      </div>
+      <div class="vol-track"><div class="vol-fill" style="width:${v.pct}%"></div></div>
     </div>
   `).join("");
 
-  // 6. 26-Week Tile Matrix
+  // Coaches Synthesized
+  document.getElementById("coachesList").innerHTML = PLAN_DATA.expertFrameworks.map(f => `
+    <div class="list-item">
+      <div class="li-top">
+        <span class="li-title">${f.name}</span>
+        <span class="li-meta">${f.role}</span>
+      </div>
+      <div class="li-sub">${f.detail}</div>
+    </div>
+  `).join("");
+
+  // 26-Week Schedule Grid
   const gridEl = document.getElementById("weekMatrixGrid");
   gridEl.innerHTML = PLAN_DATA.weeks.map(w => {
     const dt = addDays(w.startDate, 0);
-    let daysDone = 0;
-    let proteinDaysHit = 0;
+    let gymDone = 0;
+    let proteinDone = 0;
     [0, 1, 3, 4, 5].forEach(dIdx => {
-      if (getDayCompletion(w.week, dIdx).isComplete) daysDone++;
+      if (getDayCompletion(w.week, dIdx).isComplete) gymDone++;
     });
     for (let dIdx = 0; dIdx < 7; dIdx++) {
-      if (getDayProteinConsumed(w.week, dIdx) >= t.proteinFloorG) proteinDaysHit++;
+      if (getDayProteinConsumed(w.week, dIdx) >= t.proteinFloorG) proteinDone++;
     }
     const isCurrent = w.week === state.currentWeek;
 
     return `
-      <button class="matrix-tile ${isCurrent ? "active-tile" : ""}" data-wk="${w.week}">
-        <div class="mt-top">
-          <span class="mt-wk">W${String(w.week).padStart(2, "0")} · ${w.blockType}</span>
-          <span class="mt-date">${formatShortDate(dt)}</span>
+      <button class="wk-tile ${isCurrent ? "active" : ""}" data-wk="${w.week}">
+        <div class="wt-top">
+          <span>W${String(w.week).padStart(2, "0")} · ${w.blockType}</span>
+          <span class="wt-date">${formatShortDate(dt)}</span>
         </div>
-        <div class="mt-loads">Pull +${w.pullUpLoad}kg · Dip +${w.dipLoad}kg</div>
-        <div class="mt-run">Gym ${daysDone}/5 · Protein ${proteinDaysHit}/7</div>
+        <div class="wt-line">Pull +${w.pullUpLoad}kg · Dip +${w.dipLoad}kg</div>
+        <div class="wt-sub">${w.rirTarget} · Gym ${gymDone}/5 · P ${proteinDone}/7</div>
       </button>
     `;
   }).join("");
 
-  gridEl.querySelectorAll(".matrix-tile").forEach(tile => {
+  gridEl.querySelectorAll(".wk-tile").forEach(tile => {
     tile.addEventListener("click", () => {
       state.currentWeek = parseInt(tile.dataset.wk, 10);
       switchMode("workout");
@@ -707,28 +650,28 @@ function renderGeneticsAndMatrix() {
 function switchMode(modeName) {
   state.activeMode = modeName;
   saveState();
-  document.querySelectorAll(".mode-pill").forEach(btn => {
+  document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.classList.toggle("active", btn.dataset.mode === modeName);
   });
-  document.querySelectorAll(".studio-panel").forEach(panel => {
+  document.querySelectorAll(".tab-panel").forEach(panel => {
     panel.classList.toggle("active", panel.id === `mode-${modeName}`);
   });
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-// Rest Timer Pill
+// Rest Timer
 function formatClock(sec) {
   const m = Math.floor(sec / 60);
   const s = sec % 60;
   return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
-function startRestPill(seconds) {
+function startRestBar(seconds) {
   if (timerInterval) clearInterval(timerInterval);
   timerSeconds = seconds;
-  const pill = document.getElementById("restPill");
+  const bar = document.getElementById("restPill");
   const clock = document.getElementById("rpClock");
-  pill.classList.remove("hidden");
+  bar.classList.remove("hidden");
   clock.textContent = formatClock(timerSeconds);
 
   timerInterval = setInterval(() => {
@@ -737,25 +680,25 @@ function startRestPill(seconds) {
       clock.textContent = formatClock(timerSeconds);
     } else {
       clearInterval(timerInterval);
-      clock.textContent = "NEXT SET!";
-      setTimeout(() => pill.classList.add("hidden"), 2500);
+      clock.textContent = "Go";
+      setTimeout(() => bar.classList.add("hidden"), 2000);
     }
   }, 1000);
 }
 
 function renderAll() {
-  renderWorkoutCanvas();
-  renderMuscleUpLab();
-  renderGeneticsAndMatrix();
+  renderWorkoutTab();
+  renderNutritionTab();
+  renderPlanTab();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  // 3-Way Studio Mode Switcher
-  document.querySelectorAll(".mode-pill").forEach(btn => {
+  // Tabs
+  document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.addEventListener("click", () => switchMode(btn.dataset.mode));
   });
 
-  // Week Dial Arrows
+  // Week Nav
   document.getElementById("prevWeekBtn").addEventListener("click", () => {
     if (state.currentWeek > 1) {
       state.currentWeek--;
@@ -772,62 +715,26 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Jump to Today's Real Calendar Session
+  // Jump to Today
   document.getElementById("jumpTodayQuickBtn").addEventListener("click", () => {
-    const todayPos = getTodayProgramPosition();
-    state.currentWeek = todayPos.week;
-    state.currentDayIndex = todayPos.dayIndex;
-    state.lastVisitedIsoDate = todayPos.todayIso;
+    const pos = getTodayProgramPosition();
+    state.currentWeek = pos.week;
+    state.currentDayIndex = pos.dayIndex;
+    state.lastVisitedIsoDate = pos.todayIso;
     switchMode("workout");
     saveState();
     renderAll();
   });
 
-  // Toggle Plain-English Workout Decoder
-  document.getElementById("toggleDecoderBtn").addEventListener("click", () => {
-    state.decoderOpen = !state.decoderOpen;
-    saveState();
-    renderWorkoutCanvas();
-  });
-
-  // Open Fuel & Science Tab directly from Protein Card
-  document.getElementById("openFuelGuideBtn").addEventListener("click", () => {
-    switchMode("genetics");
-  });
-
-  // Quick Protein Fine-Tune Controls
-  function adjustExtraProtein(deltaG) {
-    const cur = getDayNutritionEntry(state.currentWeek, state.currentDayIndex);
-    const targets = getNutritionTargets();
-    const mealsG = cur.meals.filter(Boolean).length * targets.perMealG;
-    const nextTotal = Math.max(0, mealsG + cur.extraG + deltaG);
-    cur.extraG = nextTotal - mealsG;
-    setDayNutritionEntry(state.currentWeek, state.currentDayIndex, cur);
-    renderDailyProteinCard();
-    renderGeneticsAndMatrix();
-  }
-
-  document.getElementById("ptMinus10").addEventListener("click", () => adjustExtraProtein(-10));
-  document.getElementById("ptPlus10").addEventListener("click", () => adjustExtraProtein(10));
-  document.getElementById("ptPlus25").addEventListener("click", () => adjustExtraProtein(25));
-
-  document.getElementById("creatineToggleBtn").addEventListener("click", () => {
-    const cur = getDayNutritionEntry(state.currentWeek, state.currentDayIndex);
-    cur.creatine = !cur.creatine;
-    setDayNutritionEntry(state.currentWeek, state.currentDayIndex, cur);
-    renderDailyProteinCard();
-  });
-
-  // Tap Poster Sculpture Ring to Stamp Entire Day Complete
-  document.getElementById("posterCompleteTrigger").addEventListener("click", () => {
+  // Mark All Sets Done / Undone
+  document.getElementById("markAllDoneBtn").addEventListener("click", () => {
     const weekObj = PLAN_DATA.weeks.find(w => w.week === state.currentWeek);
     const dayObj = PLAN_DATA.daysTemplate[state.currentDayIndex];
-    const comp = getDayCompletion(state.currentWeek, state.currentDayIndex);
-    const target = !comp.isComplete;
+    const target = !getDayCompletion(state.currentWeek, state.currentDayIndex).isComplete;
 
     dayObj.exercises.forEach(ex => {
-      const numSets = getEffectiveSetsCount(ex, weekObj);
-      for (let s = 0; s < numSets; s++) {
+      const n = getEffectiveSetsCount(ex, weekObj);
+      for (let s = 0; s < n; s++) {
         const k = `w${state.currentWeek}_d${state.currentDayIndex}_${ex.id}_s${s}`;
         if (target) state.setChecks[k] = true;
         else delete state.setChecks[k];
@@ -837,17 +744,44 @@ document.addEventListener("DOMContentLoaded", () => {
     renderAll();
   });
 
-  // Daily Note Input
-  document.getElementById("dailyNoteInput").addEventListener("input", e => {
-    const noteKey = `w${state.currentWeek}_d${state.currentDayIndex}`;
-    state.dayNotes[noteKey] = e.target.value;
-    saveState();
-    const st = document.getElementById("fnSaveStatus");
-    st.textContent = "Saved ✓";
-    setTimeout(() => { st.textContent = "Synced to device"; }, 1200);
+  // Protein Controls
+  function adjustProtein(delta) {
+    const cur = getDayNutritionEntry(state.currentWeek, state.currentDayIndex);
+    const t = getNutritionTargets();
+    const mealsG = cur.meals.filter(Boolean).length * t.perMealG;
+    const nextTotal = Math.max(0, mealsG + cur.extraG + delta);
+    cur.extraG = nextTotal - mealsG;
+    setDayNutritionEntry(state.currentWeek, state.currentDayIndex, cur);
+    renderProteinStrip();
+    renderPlanTab();
+  }
+
+  document.getElementById("ptMinus10").addEventListener("click", () => adjustProtein(-10));
+  document.getElementById("ptPlus10").addEventListener("click", () => adjustProtein(10));
+  document.getElementById("ptPlus25").addEventListener("click", () => adjustProtein(25));
+
+  document.getElementById("creatineToggleBtn").addEventListener("click", () => {
+    const cur = getDayNutritionEntry(state.currentWeek, state.currentDayIndex);
+    cur.creatine = !cur.creatine;
+    setDayNutritionEntry(state.currentWeek, state.currentDayIndex, cur);
+    renderProteinStrip();
   });
 
-  // Bodyweight Stepper
+  document.getElementById("openFuelGuideBtn").addEventListener("click", () => {
+    switchMode("nutrition");
+  });
+
+  // Session Note
+  document.getElementById("dailyNoteInput").addEventListener("input", e => {
+    const key = `w${state.currentWeek}_d${state.currentDayIndex}`;
+    state.dayNotes[key] = e.target.value;
+    saveState();
+    const st = document.getElementById("fnSaveStatus");
+    st.textContent = "Saved";
+    setTimeout(() => { st.textContent = "Saved locally"; }, 1000);
+  });
+
+  // Bodyweight & Goal Mode
   document.getElementById("bwMinus").addEventListener("click", () => {
     state.bodyweightKg = Math.max(45, (parseFloat(state.bodyweightKg) || 75) - 0.5);
     saveState();
@@ -860,8 +794,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderAll();
   });
 
-  // Goal Mode Switcher (Skinny-Fat Recomp vs Controlled Lean Bulk)
-  document.querySelectorAll(".goal-pill").forEach(btn => {
+  document.querySelectorAll(".seg-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       state.goalMode = btn.dataset.goal;
       saveState();
@@ -869,15 +802,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Clear Today (Sets + Today's Protein) & Export JSON
+  // Clear Day & Export Backup
   document.getElementById("resetDayBtn").addEventListener("click", () => {
     const weekObj = PLAN_DATA.weeks.find(w => w.week === state.currentWeek);
     const dayObj = PLAN_DATA.daysTemplate[state.currentDayIndex];
     dayObj.exercises.forEach(ex => {
-      const numSets = getEffectiveSetsCount(ex, weekObj);
-      for (let s = 0; s < numSets; s++) {
+      const n = getEffectiveSetsCount(ex, weekObj);
+      for (let s = 0; s < n; s++) {
         delete state.setChecks[`w${state.currentWeek}_d${state.currentDayIndex}_${ex.id}_s${s}`];
       }
+      delete state.exerciseLogs[`w${state.currentWeek}_${ex.id}`];
     });
     delete state.nutritionLog[`w${state.currentWeek}_d${state.currentDayIndex}`];
     saveState();
@@ -889,27 +823,28 @@ document.addEventListener("DOMContentLoaded", () => {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
     const a = document.createElement("a");
     a.setAttribute("href", dataStr);
-    a.setAttribute("download", `hybrid26_w${state.currentWeek}.json`);
+    a.setAttribute("download", `26w_backup_w${state.currentWeek}.json`);
     document.body.appendChild(a);
     a.click();
     a.remove();
   });
 
-  // Rest Pill Controls
+  // Rest Bar Controls
   document.getElementById("rpMinus").addEventListener("click", () => {
     timerSeconds = Math.max(0, timerSeconds - 15);
     document.getElementById("rpClock").textContent = formatClock(timerSeconds);
   });
+
   document.getElementById("rpPlus").addEventListener("click", () => {
     timerSeconds += 15;
     document.getElementById("rpClock").textContent = formatClock(timerSeconds);
   });
+
   document.getElementById("rpClose").addEventListener("click", () => {
     if (timerInterval) clearInterval(timerInterval);
     document.getElementById("restPill").classList.add("hidden");
   });
 
-  // Initial Render
   switchMode(state.activeMode || "workout");
   renderAll();
 });
