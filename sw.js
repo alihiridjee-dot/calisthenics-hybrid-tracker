@@ -1,4 +1,4 @@
-const CACHE_NAME = "26w-studio-v1";
+const CACHE_NAME = "26w-studio-v2";
 const ASSETS = [
   "./",
   "./index.html",
@@ -25,8 +25,17 @@ self.addEventListener("activate", event => {
   self.clients.claim();
 });
 
+// Network-first with offline cache fallback so updates load immediately
 self.addEventListener("fetch", event => {
   event.respondWith(
-    caches.match(event.request).then(cached => cached || fetch(event.request))
+    fetch(event.request)
+      .then(response => {
+        if (response && response.status === 200 && response.type === "basic") {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+        }
+        return response;
+      })
+      .catch(() => caches.match(event.request))
   );
 });
