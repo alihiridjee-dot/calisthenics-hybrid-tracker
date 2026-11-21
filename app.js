@@ -1,13 +1,53 @@
-// 26W • South Asian Hypertrophy, Muscle-Up Lab & 45–55 Min Tactile Studio Logic
+// 26W • South Asian Hardgainer Hypertrophy, Protein Targets & 60-Min Tactile Studio Logic
 
-const STORAGE_KEY = "hybrid26_tracker_state_v2";
+const STORAGE_KEY = "hybrid26_tracker_state_v3";
+const LEGACY_STORAGE_KEY = "hybrid26_tracker_state_v2";
+
+// Local Calendar Date Utilities
+function getLocalIsoDate(d = new Date()) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+function isoToUtcMs(isoStr) {
+  const [y, m, d] = isoStr.split("-").map(Number);
+  return Date.UTC(y, m - 1, d);
+}
+
+function getTodayProgramPosition() {
+  const todayIso = getLocalIsoDate();
+  const startMs = isoToUtcMs(PLAN_DATA.meta.startDate);
+  const todayMs = isoToUtcMs(todayIso);
+  const diffDays = Math.floor((todayMs - startMs) / 86400000);
+
+  if (diffDays < 0) {
+    return { week: 1, dayIndex: 0, todayIso, isInProgramRange: false };
+  }
+  const maxDays = PLAN_DATA.weeks.length * 7 - 1;
+  if (diffDays > maxDays) {
+    return { week: PLAN_DATA.weeks.length, dayIndex: 6, todayIso, isInProgramRange: false };
+  }
+  return {
+    week: Math.floor(diffDays / 7) + 1,
+    dayIndex: diffDays % 7,
+    todayIso,
+    isInProgramRange: true
+  };
+}
+
+const initialToday = getTodayProgramPosition();
 
 const defaultState = {
   activeMode: "workout", // "workout" | "muscleup" | "genetics"
-  currentWeek: 1,
-  currentDayIndex: 0,
+  currentWeek: initialToday.week,
+  currentDayIndex: initialToday.dayIndex,
+  lastVisitedIsoDate: initialToday.todayIso,
   bodyweightKg: PLAN_DATA.meta.defaultBodyweightKg,
+  goalMode: PLAN_DATA.meta.defaultGoalMode, // "recomp" | "leanbulk"
   setChecks: {},
+  nutritionLog: {}, // { w1_d0: { meals: [bool, bool, bool, bool], extraG: 0, creatine: bool } }
   dayNotes: {},
   openBlueprints: {},
   unlockedMuStages: {},
@@ -21,8 +61,29 @@ let timerSeconds = 0;
 function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { ...defaultState };
-    return { ...defaultState, ...JSON.parse(raw) };
+    if (raw) {
+      const parsed = { ...defaultState, ...JSON.parse(raw) };
+      // If it's a new calendar day, automatically open to today's real session
+      const todayPos = getTodayProgramPosition();
+      if (parsed.lastVisitedIsoDate !== todayPos.todayIso && todayPos.isInProgramRange) {
+        parsed.currentWeek = todayPos.week;
+        parsed.currentDayIndex = todayPos.dayIndex;
+        parsed.lastVisitedIsoDate = todayPos.todayIso;
+      }
+      return parsed;
+    }
+
+    // Migrate bodyweight & muscle-up milestones gently from v2 if present
+    const legacyRaw = localStorage.getItem(LEGACY_STORAGE_KEY);
+    if (legacyRaw) {
+      const legacy = JSON.parse(legacyRaw);
+      return {
+        ...defaultState,
+        bodyweightKg: legacy.bodyweightKg || PLAN_DATA.meta.defaultBodyweightKg,
+        unlockedMuStages: legacy.unlockedMuStages || {}
+      };
+    }
+    return { ...defaultState };
   } catch (e) {
     return { ...defaultState };
   }
@@ -42,6 +103,13 @@ function addDays(isoDateStr, daysToAdd) {
   return dt;
 }
 
+function dateToIsoUtc(dt) {
+  const y = dt.getUTCFullYear();
+  const m = String(dt.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(dt.getUTCDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
 function formatEditorialDate(dt, dayName) {
   const months = [
     "January", "February", "March", "April", "May", "June",
@@ -53,6 +121,84 @@ function formatEditorialDate(dt, dayName) {
 function formatShortDate(dt) {
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   return `${dt.getUTCDate()} ${months[dt.getUTCMonth()]}`;
+}
+
+// Evidence-Based Nutrition & Protein Calculations (Morton 2018, Schoenfeld & Aragon 2018, Barakat 2020, Helms 2023)
+function getNutritionTargets() {
+  const bw = parseFloat(state.bodyweightKg) || 75;
+  const heightM = PLAN_DATA.meta.heightCm / 100;
+  const bmi = (bw / (heightM * heightM)).toFixed(1);
+  const mode = state.goalMode || "recomp";
+
+  // Protein Floor (Morton et al., 2018 mean breakpoint = 1.62 g/kg) & Upper CI (2.2 g/kg)
+  const proteinFloorG = Math.round(bw * 1.6);
+  const proteinCeilingG = Math.round(bw * 2.2);
+
+  // Per-meal bolus scaled to 4 meals (Schoenfeld & Aragon 2018: 0.40-0.55 g/kg/meal)
+  // Recomp uses ~2.13 g/kg (Barakat et al. 2020); Lean Bulk uses ~2.0 g/kg leaving extra carb room
+  const targetMultiplier = mode === "recomp" ? 2.13 : 2.0;
+  const perMealG = Math.round((bw * targetMultiplier) / 4);
+  const proteinTargetG = perMealG * 4; // Ensures 4 meal pills = 100% cleanly
+  const actualGPerKg = (proteinTargetG / bw).toFixed(2);
+  const leucinePerMealG = (perMealG * 0.088).toFixed(1); // ~8.5-9.5% leucine in complete animal/whey proteins
+
+  // Estimated maintenance kcal for 6'0" (183 cm) male training 5x/week (~34.5 kcal/kg baseline)
+  const maintenanceKcal = Math.round((bw * 34.5) / 25) * 25;
+  const targetKcal = mode === "recomp"
+    ? maintenanceKcal
+    : Math.round((maintenanceKcal * 1.075) / 25) * 25; // +7.5% controlled lean surplus (Helms et al. 2023)
+
+  // Fats: ~0.85 g/kg for hormonal health; remainder to carbohydrates (timed peri-workout)
+  const fatG = Math.round(bw * 0.85);
+  const carbG = Math.max(120, Math.round((targetKcal - proteinTargetG * 4 - fatG * 9) / 4));
+  const periWorkoutCarbG = Math.round(carbG * 0.65);
+
+  const weeklyGainMinKg = (bw * 0.0025).toFixed(2);
+  const weeklyGainMaxKg = (bw * 0.0038).toFixed(2);
+
+  return {
+    bw,
+    bmi,
+    mode,
+    proteinFloorG,
+    proteinTargetG,
+    proteinCeilingG,
+    perMealG,
+    actualGPerKg,
+    leucinePerMealG,
+    maintenanceKcal,
+    targetKcal,
+    fatG,
+    carbG,
+    periWorkoutCarbG,
+    weeklyGainMinKg,
+    weeklyGainMaxKg
+  };
+}
+
+function getDayNutritionEntry(weekNum, dayIndex) {
+  const key = `w${weekNum}_d${dayIndex}`;
+  const entry = state.nutritionLog[key];
+  if (!entry) {
+    return { meals: [false, false, false, false], extraG: 0, creatine: false };
+  }
+  return {
+    meals: Array.isArray(entry.meals) ? [...entry.meals] : [false, false, false, false],
+    extraG: typeof entry.extraG === "number" ? entry.extraG : 0,
+    creatine: !!entry.creatine
+  };
+}
+
+function setDayNutritionEntry(weekNum, dayIndex, entry) {
+  state.nutritionLog[`w${weekNum}_d${dayIndex}`] = entry;
+  saveState();
+}
+
+function getDayProteinConsumed(weekNum, dayIndex) {
+  const targets = getNutritionTargets();
+  const entry = getDayNutritionEntry(weekNum, dayIndex);
+  const checkedMeals = entry.meals.filter(Boolean).length;
+  return Math.max(0, checkedMeals * targets.perMealG + entry.extraG);
 }
 
 // Parse dynamic set counts (supports both "4 sets of 4 reps" and "4 x 4")
@@ -94,8 +240,8 @@ function getDynamicPrescription(exercise, weekObj) {
   if (exercise.dynamicKey === "thu_muscleup") {
     return weekObj.muscleUpDrill;
   }
-  if (exercise.dynamicKey === "sat_treadmill") {
-    return weekObj.satTreadmill;
+  if (exercise.dynamicKey === "thu_treadmill") {
+    return weekObj.qualityRun;
   }
   return `${exercise.setsLabel} of ${exercise.repsLabel}`;
 }
@@ -125,11 +271,78 @@ function getDayCompletion(weekNum, dayIndex) {
   };
 }
 
-// Render Mode 01: Today's 45–55 Min Workout Canvas
+// Render Daily Protein & Creatine Card on Mode 01
+function renderDailyProteinCard() {
+  const targets = getNutritionTargets();
+  const entry = getDayNutritionEntry(state.currentWeek, state.currentDayIndex);
+  const consumed = getDayProteinConsumed(state.currentWeek, state.currentDayIndex);
+  const pct = Math.min(100, Math.round((consumed / targets.proteinTargetG) * 100));
+  const floorPct = Math.min(95, Math.round((targets.proteinFloorG / targets.proteinTargetG) * 100));
+
+  const modeLabel = targets.mode === "recomp" ? "RECOMP" : "LEAN BULK";
+  document.getElementById("ptModeEyebrow").textContent =
+    `DAILY PROTEIN GOAL · ${targets.actualGPerKg} g/kg (${modeLabel})`;
+  document.getElementById("ptCurrentVal").textContent = `${consumed}g`;
+  document.getElementById("ptTargetVal").textContent = `${targets.proteinTargetG}g`;
+
+  const cardEl = document.getElementById("proteinTrackerCard");
+  const statusEl = document.getElementById("ptStatusPill");
+
+  cardEl.classList.remove("hit-floor", "hit-target");
+  if (consumed >= targets.proteinTargetG) {
+    cardEl.classList.add("hit-target");
+    statusEl.textContent = "Target Hit ✓";
+  } else if (consumed >= targets.proteinFloorG) {
+    cardEl.classList.add("hit-floor");
+    statusEl.textContent = `Above 1.6 g/kg Floor (+${targets.proteinTargetG - consumed}g to goal)`;
+  } else {
+    statusEl.textContent = `${targets.proteinTargetG - consumed}g left · Floor ${targets.proteinFloorG}g`;
+  }
+
+  document.getElementById("ptBarFill").style.width = `${pct}%`;
+  document.getElementById("ptFloorMarker").style.left = `${floorPct}%`;
+  document.getElementById("ptFloorLabel").textContent = `${targets.proteinFloorG}g Floor (1.6 g/kg)`;
+  document.getElementById("ptCeilingLabel").textContent = `${targets.proteinTargetG}g Goal`;
+
+  // 4 One-Tap Meal Bolus Chips
+  const mealsGrid = document.getElementById("ptMealsGrid");
+  mealsGrid.innerHTML = PLAN_DATA.mealSlots.map((slot, idx) => {
+    const isChecked = !!entry.meals[idx];
+    return `
+      <button class="pt-meal-btn ${isChecked ? "checked" : ""}" data-meal-idx="${idx}" title="${slot.timing}">
+        <span class="ptm-top">${slot.short} · ${isChecked ? "✓" : `${targets.perMealG}g`}</span>
+        <span class="ptm-lbl">${slot.label}</span>
+      </button>
+    `;
+  }).join("");
+
+  mealsGrid.querySelectorAll(".pt-meal-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const idx = parseInt(btn.dataset.mealIdx, 10);
+      const cur = getDayNutritionEntry(state.currentWeek, state.currentDayIndex);
+      cur.meals[idx] = !cur.meals[idx];
+      setDayNutritionEntry(state.currentWeek, state.currentDayIndex, cur);
+      renderDailyProteinCard();
+      renderGeneticsAndMatrix();
+    });
+  });
+
+  // Creatine Toggle
+  const crBtn = document.getElementById("creatineToggleBtn");
+  crBtn.classList.toggle("active", entry.creatine);
+  crBtn.innerHTML = entry.creatine
+    ? `<span class="cr-dot"></span> 5g Creatine ✓`
+    : `<span class="cr-dot"></span> 5g Creatine`;
+}
+
+// Render Mode 01: Today's 60-Min Workout Canvas
 function renderWorkoutCanvas() {
   const weekObj = PLAN_DATA.weeks.find(w => w.week === state.currentWeek);
   const dayObj = PLAN_DATA.daysTemplate[state.currentDayIndex];
-  const currentDate = addDays(weekObj.monDate, dayObj.dayIndex);
+  const currentDate = addDays(weekObj.startDate, dayObj.dayIndex);
+  const currentIso = dateToIsoUtc(currentDate);
+  const todayIso = getLocalIsoDate();
+  const isToday = currentIso === todayIso;
   const dayComp = getDayCompletion(state.currentWeek, state.currentDayIndex);
 
   // 1. Top Dial & Phase Tag
@@ -139,6 +352,7 @@ function renderWorkoutCanvas() {
 
   // 2. Editorial Poster Stage
   document.getElementById("posterDateLine").textContent = formatEditorialDate(currentDate, dayObj.dayName);
+  document.getElementById("todayBadge").classList.toggle("hidden", !isToday);
   document.getElementById("durationCapsule").textContent = `⏱ ${dayObj.estimatedMinutes} MIN SESSION`;
   document.getElementById("posterTitle").textContent = dayObj.sessionTitle;
 
@@ -146,9 +360,9 @@ function renderWorkoutCanvas() {
     0: `Paired A1/A2: Pull-Up +${weekObj.pullUpLoad}kg (${weekObj.pullUpScheme}) & Dip +${weekObj.dipLoad}kg (${weekObj.dipScheme})`,
     1: dayObj.focus,
     2: dayObj.focus,
-    3: `${weekObj.muscleUpDrill} · Paired Volume Pull-Ups (${weekObj.volPullUps}) & Tempo Dips`,
+    3: `${weekObj.muscleUpDrill} · Volume Pull-Ups (${weekObj.volPullUps}) & Stretch Hypertrophy`,
     4: dayObj.focus,
-    5: `Main Set: ${weekObj.satTreadmill}`,
+    5: `Weak-Point Frame (Upper Chest, 4× Laterals, Arms) + ${weekObj.qualityRun}`,
     6: dayObj.focus
   };
   document.getElementById("posterFocusNote").textContent = dynamicFocusByDay[dayObj.dayIndex];
@@ -169,7 +383,7 @@ function renderWorkoutCanvas() {
   const decoderBtn = document.getElementById("toggleDecoderBtn");
   decoderBox.classList.toggle("hidden", !state.decoderOpen);
   decoderBtn.classList.toggle("active", state.decoderOpen);
-  decoderBtn.textContent = state.decoderOpen ? "Hide Decoder ✕" : "What does “4×4” mean?";
+  decoderBtn.textContent = state.decoderOpen ? "Hide Guide ✕" : "Guide & Terms";
 
   document.getElementById("decoderGrid").innerHTML = PLAN_DATA.decoder.map(d => `
     <div class="decoder-item">
@@ -178,16 +392,17 @@ function renderWorkoutCanvas() {
     </div>
   `).join("");
 
-  // 3. 7-Day Tactile Ribbon
-  const letters = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
+  // 3. 7-Day Tactile Ribbon (SAT SUN MON TUE WED THU FRI)
   const ribbonEl = document.getElementById("dayRibbon");
   ribbonEl.innerHTML = PLAN_DATA.daysTemplate.map((d, idx) => {
-    const dt = addDays(weekObj.monDate, idx);
+    const dt = addDays(weekObj.startDate, idx);
+    const dtIso = dateToIsoUtc(dt);
     const comp = getDayCompletion(state.currentWeek, idx);
     const isActive = idx === state.currentDayIndex;
+    const pillIsToday = dtIso === todayIso;
     return `
-      <button class="ribbon-pill ${isActive ? "active" : ""} ${comp.isComplete ? "done" : ""}" data-didx="${idx}">
-        <span class="r-day-let">${letters[idx]}</span>
+      <button class="ribbon-pill ${isActive ? "active" : ""} ${comp.isComplete ? "done" : ""} ${pillIsToday ? "is-today" : ""}" data-didx="${idx}">
+        <span class="r-day-let">${d.shortName}</span>
         <span class="r-day-num">${dt.getUTCDate()}</span>
         <span class="r-pip"></span>
       </button>
@@ -202,7 +417,10 @@ function renderWorkoutCanvas() {
     });
   });
 
-  // 4. Interactive Movement Deck
+  // 4. Daily Protein & Creatine Card
+  renderDailyProteinCard();
+
+  // 5. Interactive Movement Deck
   const deckEl = document.getElementById("movementDeck");
   deckEl.innerHTML = dayObj.exercises.map((ex, idx) => {
     const numSets = getEffectiveSetsCount(ex, weekObj);
@@ -293,7 +511,7 @@ function renderWorkoutCanvas() {
     });
   });
 
-  // 5. Analog Field Note
+  // 6. Analog Field Note
   const noteKey = `w${state.currentWeek}_d${state.currentDayIndex}`;
   document.getElementById("dailyNoteInput").value = state.dayNotes[noteKey] || "";
 }
@@ -304,7 +522,7 @@ function renderMuscleUpLab() {
   document.getElementById("muCurrentWeekBadge").textContent = `WEEK ${weekObj.week} PRESCRIPTION`;
   document.getElementById("muActiveDrillBox").innerHTML = `
     <div style="font-size:0.68rem;font-weight:800;letter-spacing:0.08em;color:#fbbf24;margin-bottom:2px;">
-      THIS THURSDAY'S FRESH SKILL PRIMER (8 MINS)
+      THIS TUESDAY'S FRESH SKILL PRIMER (9 MINS)
     </div>
     <div style="font-weight:800;font-size:0.95rem;color:#fff;">
       ${weekObj.muscleUpDrill}
@@ -330,7 +548,7 @@ function renderMuscleUpLab() {
           ${st.cue}
         </p>
         <div style="font-size:0.75rem;font-weight:700;background:rgba(22,21,20,0.05);padding:7px 10px;border-radius:10px;">
-          Thursday Drill: ${st.drill}
+          Tuesday Drill: ${st.drill}
         </div>
       </div>
     `;
@@ -346,9 +564,90 @@ function renderMuscleUpLab() {
   });
 }
 
-// Render Mode 03: South Asian Genetics, Protein Dial & 26-Week Matrix
+// Render Mode 03: Protein, South Asian Physiology, Volume Audit, Citations & 26W Matrix
 function renderGeneticsAndMatrix() {
-  // 1. South Asian Manifesto
+  const t = getNutritionTargets();
+
+  // 1. Bodyweight & Goal Mode Dial
+  document.getElementById("bwDisplayVal").textContent = `${t.bw} kg`;
+  document.getElementById("bmiSubText").textContent =
+    `BMI ${t.bmi} · South Asian Thin-Fat / Hardgainer Calibration`;
+
+  document.getElementById("goalRecompBtn").classList.toggle("active", t.mode === "recomp");
+  document.getElementById("goalBulkBtn").classList.toggle("active", t.mode === "leanbulk");
+
+  document.getElementById("macroSummaryGrid").innerHTML = `
+    <div class="macro-box primary">
+      <span class="mb-kicker">DAILY PROTEIN</span>
+      <strong class="mb-val">${t.proteinTargetG}g</strong>
+      <span class="mb-sub">${t.actualGPerKg} g/kg · 4×${t.perMealG}g</span>
+    </div>
+    <div class="macro-box">
+      <span class="mb-kicker">DAILY CALORIES</span>
+      <strong class="mb-val">${t.targetKcal}</strong>
+      <span class="mb-sub">${t.mode === "recomp" ? "Maintenance Recomp" : "+7.5% Lean Surplus"}</span>
+    </div>
+    <div class="macro-box">
+      <span class="mb-kicker">CARBS / FATS</span>
+      <strong class="mb-val">${t.carbG}g / ${t.fatG}g</strong>
+      <span class="mb-sub">~${t.periWorkoutCarbG}g Pre/Post Gym</span>
+    </div>
+  `;
+
+  const gainGuidance = t.mode === "recomp"
+    ? "Hold scale weight steady (±0.2 kg) while waist shrinks & lifts rise (Barakat 2020)"
+    : `Gain +${t.weeklyGainMinKg}–${t.weeklyGainMaxKg} kg/wk (0.25–0.38% BW/wk; Helms 2023)`;
+
+  document.getElementById("fdLandmarks").innerHTML = `
+    <div class="fd-item highlight-row">
+      <div>
+        <strong style="color:var(--clay-orange);display:block;">Your Optimal Protein Target (${t.actualGPerKg} g/kg) ★</strong>
+        <span style="font-size:0.74rem;color:var(--ink-mid);">4 meals × ${t.perMealG}g (~${t.leucinePerMealG}g leucine/meal · Schoenfeld &amp; Aragon 2018)</span>
+      </div>
+      <strong style="font-family:'Syne',sans-serif;font-size:1.12rem;color:var(--clay-orange);">${t.proteinTargetG} g/day</strong>
+    </div>
+    <div class="fd-item">
+      <span>Evidence-Based Hypertrophy Floor (Morton 2018 · 1.6 g/kg)</span>
+      <strong style="font-family:'Syne',sans-serif;">${t.proteinFloorG} g/day</strong>
+    </div>
+    <div class="fd-item">
+      <span>Morton 95% CI Upper Ceiling (2.2 g/kg)</span>
+      <strong style="font-family:'Syne',sans-serif;">${t.proteinCeilingG} g/day</strong>
+    </div>
+    <div class="fd-item">
+      <span>Scale Trend Target</span>
+      <strong style="text-align:right;max-width:58%;font-size:0.78rem;">${gainGuidance}</strong>
+    </div>
+    <div class="fd-item">
+      <span>Daily Strength &amp; Fullness Buffer (Kreider 2017)</span>
+      <strong style="color:var(--forest-ink);">5g Creatine Monohydrate</strong>
+    </div>
+  `;
+
+  // 2. South Asian 40g Protein Meal Ideas
+  document.getElementById("mealIdeasGrid").innerHTML = PLAN_DATA.southAsianMeals.map(m => `
+    <div class="meal-idea-card">
+      <div class="mi-tag">${m.tag}</div>
+      <div class="mi-title">${m.title}</div>
+      <div class="mi-macros">${m.macros}</div>
+      <div class="mi-detail">${m.detail}</div>
+    </div>
+  `).join("");
+
+  // 3. Weekly Hypertrophy Volume Audit
+  document.getElementById("volumeAuditGrid").innerHTML = PLAN_DATA.weeklyVolumeAudit.map(v => `
+    <div class="vol-row">
+      <div class="vol-top">
+        <span class="vol-muscle">${v.muscle}</span>
+        <span class="vol-meta">${v.sets} · <strong>${v.freq}</strong></span>
+      </div>
+      <div class="vol-bar-track">
+        <div class="vol-bar-fill" style="width:${v.pct}%"></div>
+      </div>
+    </div>
+  `).join("");
+
+  // 4. South Asian Physiology Manifesto
   const sa = PLAN_DATA.southAsianProtocol;
   document.getElementById("saHeadline").textContent = sa.headline;
   document.getElementById("saSummary").textContent = sa.summary;
@@ -360,45 +659,27 @@ function renderGeneticsAndMatrix() {
     </div>
   `).join("");
 
-  // 2. South Asian Protein & Leucine Calculator (2.0 - 2.2 g/kg)
-  const bw = parseFloat(state.bodyweightKg) || 75;
-  document.getElementById("bwDisplayVal").textContent = `${bw} kg`;
+  // 5. Peer-Reviewed Research Library
+  document.getElementById("researchStack").innerHTML = PLAN_DATA.researchCitations.map(r => `
+    <div class="research-item">
+      <div class="res-study">${r.study}</div>
+      <div class="res-finding">${r.finding}</div>
+      <div class="res-apply">In your plan: ${r.application}</div>
+    </div>
+  `).join("");
 
-  const saSweetSpot = Math.round(bw * 2.0); // 2.0 g/kg for South Asian hardgainer/recomp
-  const saUpperZone = Math.round(bw * 2.2); // 2.2 g/kg max hypertrophy/lean buffer
-  const perMeal = Math.round(saSweetSpot / 4);
-  const leucineG = (perMeal * 0.095).toFixed(1); // ~3.6g leucine per meal
-
-  document.getElementById("fdLandmarks").innerHTML = `
-    <div class="fd-item" style="background:var(--clay-soft);padding:10px 12px;border-radius:12px;">
-      <div>
-        <strong style="color:var(--clay-orange);display:block;">South Asian Sweet Spot (2.0 g/kg) ★</strong>
-        <span style="font-size:0.74rem;color:var(--ink-mid);">4 daily meals × ~${perMeal}g (~${leucineG}g leucine/meal)</span>
-      </div>
-      <strong style="font-family:'Syne',sans-serif;font-size:1.15rem;color:var(--clay-orange);">${saSweetSpot} g/day</strong>
-    </div>
-    <div class="fd-item">
-      <span>High-Density / Lean Recomp Ceiling (2.2 g/kg)</span>
-      <strong style="font-family:'Syne',sans-serif;">${saUpperZone} g/day</strong>
-    </div>
-    <div class="fd-item">
-      <span>Daily Intracellular ATP Buffer</span>
-      <strong style="color:var(--forest-ink);">5g Creatine Monohydrate</strong>
-    </div>
-    <div class="fd-item">
-      <span>Insulin-Smart Carb Window</span>
-      <strong>65% of Carbs Pre + Post Workout</strong>
-    </div>
-  `;
-
-  // 3. 26-Week Tile Matrix
+  // 6. 26-Week Tile Matrix
   const gridEl = document.getElementById("weekMatrixGrid");
   gridEl.innerHTML = PLAN_DATA.weeks.map(w => {
-    const dt = addDays(w.monDate, 0);
+    const dt = addDays(w.startDate, 0);
     let daysDone = 0;
+    let proteinDaysHit = 0;
     [0, 1, 3, 4, 5].forEach(dIdx => {
       if (getDayCompletion(w.week, dIdx).isComplete) daysDone++;
     });
+    for (let dIdx = 0; dIdx < 7; dIdx++) {
+      if (getDayProteinConsumed(w.week, dIdx) >= t.proteinFloorG) proteinDaysHit++;
+    }
     const isCurrent = w.week === state.currentWeek;
 
     return `
@@ -408,7 +689,7 @@ function renderGeneticsAndMatrix() {
           <span class="mt-date">${formatShortDate(dt)}</span>
         </div>
         <div class="mt-loads">Pull +${w.pullUpLoad}kg · Dip +${w.dipLoad}kg</div>
-        <div class="mt-run">${w.muscleUpDrill.split(":")[0]} · ${daysDone}/5 days</div>
+        <div class="mt-run">Gym ${daysDone}/5 · Protein ${proteinDaysHit}/7</div>
       </button>
     `;
   }).join("");
@@ -491,10 +772,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Reset View to Week 1 Monday
+  // Jump to Today's Real Calendar Session
   document.getElementById("jumpTodayQuickBtn").addEventListener("click", () => {
-    state.currentWeek = 1;
-    state.currentDayIndex = 0;
+    const todayPos = getTodayProgramPosition();
+    state.currentWeek = todayPos.week;
+    state.currentDayIndex = todayPos.dayIndex;
+    state.lastVisitedIsoDate = todayPos.todayIso;
     switchMode("workout");
     saveState();
     renderAll();
@@ -505,6 +788,34 @@ document.addEventListener("DOMContentLoaded", () => {
     state.decoderOpen = !state.decoderOpen;
     saveState();
     renderWorkoutCanvas();
+  });
+
+  // Open Fuel & Science Tab directly from Protein Card
+  document.getElementById("openFuelGuideBtn").addEventListener("click", () => {
+    switchMode("genetics");
+  });
+
+  // Quick Protein Fine-Tune Controls
+  function adjustExtraProtein(deltaG) {
+    const cur = getDayNutritionEntry(state.currentWeek, state.currentDayIndex);
+    const targets = getNutritionTargets();
+    const mealsG = cur.meals.filter(Boolean).length * targets.perMealG;
+    const nextTotal = Math.max(0, mealsG + cur.extraG + deltaG);
+    cur.extraG = nextTotal - mealsG;
+    setDayNutritionEntry(state.currentWeek, state.currentDayIndex, cur);
+    renderDailyProteinCard();
+    renderGeneticsAndMatrix();
+  }
+
+  document.getElementById("ptMinus10").addEventListener("click", () => adjustExtraProtein(-10));
+  document.getElementById("ptPlus10").addEventListener("click", () => adjustExtraProtein(10));
+  document.getElementById("ptPlus25").addEventListener("click", () => adjustExtraProtein(25));
+
+  document.getElementById("creatineToggleBtn").addEventListener("click", () => {
+    const cur = getDayNutritionEntry(state.currentWeek, state.currentDayIndex);
+    cur.creatine = !cur.creatine;
+    setDayNutritionEntry(state.currentWeek, state.currentDayIndex, cur);
+    renderDailyProteinCard();
   });
 
   // Tap Poster Sculpture Ring to Stamp Entire Day Complete
@@ -538,18 +849,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Bodyweight Stepper
   document.getElementById("bwMinus").addEventListener("click", () => {
-    state.bodyweightKg = Math.max(40, (parseFloat(state.bodyweightKg) || 75) - 0.5);
+    state.bodyweightKg = Math.max(45, (parseFloat(state.bodyweightKg) || 75) - 0.5);
     saveState();
-    renderGeneticsAndMatrix();
+    renderAll();
   });
 
   document.getElementById("bwPlus").addEventListener("click", () => {
-    state.bodyweightKg = Math.min(150, (parseFloat(state.bodyweightKg) || 75) + 0.5);
+    state.bodyweightKg = Math.min(140, (parseFloat(state.bodyweightKg) || 75) + 0.5);
     saveState();
-    renderGeneticsAndMatrix();
+    renderAll();
   });
 
-  // Clear Today & Export JSON
+  // Goal Mode Switcher (Skinny-Fat Recomp vs Controlled Lean Bulk)
+  document.querySelectorAll(".goal-pill").forEach(btn => {
+    btn.addEventListener("click", () => {
+      state.goalMode = btn.dataset.goal;
+      saveState();
+      renderAll();
+    });
+  });
+
+  // Clear Today (Sets + Today's Protein) & Export JSON
   document.getElementById("resetDayBtn").addEventListener("click", () => {
     const weekObj = PLAN_DATA.weeks.find(w => w.week === state.currentWeek);
     const dayObj = PLAN_DATA.daysTemplate[state.currentDayIndex];
@@ -559,6 +879,7 @@ document.addEventListener("DOMContentLoaded", () => {
         delete state.setChecks[`w${state.currentWeek}_d${state.currentDayIndex}_${ex.id}_s${s}`];
       }
     });
+    delete state.nutritionLog[`w${state.currentWeek}_d${state.currentDayIndex}`];
     saveState();
     switchMode("workout");
     renderAll();

@@ -1254,3 +1254,524 @@ body {
   border-radius: var(--radius-pill);
   cursor: pointer;
 }
+
+/* ================================================================= */
+/* NEW: TODAY BADGE, DAILY PROTEIN TRACKER & RESEARCH SECTIONS       */
+/* ================================================================= */
+.today-badge {
+  background: var(--clay-orange);
+  color: #ffffff;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+}
+
+.today-badge.hidden {
+  display: none;
+}
+
+.ribbon-pill.is-today:not(.active) {
+  background: rgba(217, 78, 40, 0.1);
+  box-shadow: inset 0 0 0 1.5px rgba(217, 78, 40, 0.35);
+}
+
+.ribbon-pill.is-today:not(.active) .r-day-let {
+  color: var(--clay-orange);
+}
+
+/* Daily Protein & Creatine Card (Mode 01) */
+.protein-tracker-card {
+  background: var(--card-warm);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-xl);
+  padding: 16px 18px;
+  margin-bottom: 18px;
+  box-shadow: var(--shadow-tactile);
+  transition: border-color 0.25s ease, background 0.25s ease;
+}
+
+.protein-tracker-card.hit-floor {
+  border-color: rgba(217, 78, 40, 0.28);
+}
+
+.protein-tracker-card.hit-target {
+  background: var(--forest-soft);
+  border-color: rgba(27, 73, 54, 0.28);
+}
+
+.pt-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.pt-eyebrow {
+  display: block;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  color: var(--clay-orange);
+  margin-bottom: 2px;
+}
+
+.protein-tracker-card.hit-target .pt-eyebrow {
+  color: var(--forest-ink);
+}
+
+.pt-totals-row {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.pt-current {
+  font-family: "Syne", sans-serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--ink-dark);
+}
+
+.pt-slash,
+.pt-target {
+  font-family: "Syne", sans-serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--ink-mid);
+}
+
+.pt-status-pill {
+  font-size: 0.68rem;
+  font-weight: 700;
+  background: rgba(22, 21, 20, 0.06);
+  color: var(--ink-mid);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  margin-left: 3px;
+}
+
+.protein-tracker-card.hit-target .pt-status-pill {
+  background: rgba(27, 73, 54, 0.14);
+  color: var(--forest-ink);
+}
+
+.pt-guide-link {
+  border: 1px solid var(--border-strong);
+  background: var(--card-pure);
+  color: var(--ink-dark);
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 5px 10px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  font-family: inherit;
+  flex-shrink: 0;
+}
+
+.pt-bar-wrap {
+  margin-bottom: 12px;
+}
+
+.pt-bar-track {
+  position: relative;
+  height: 10px;
+  background: rgba(22, 21, 20, 0.08);
+  border-radius: 99px;
+  overflow: visible;
+}
+
+.pt-bar-fill {
+  height: 100%;
+  background: var(--clay-orange);
+  border-radius: 99px;
+  transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1), background 0.25s ease;
+}
+
+.protein-tracker-card.hit-target .pt-bar-fill {
+  background: var(--forest-ink);
+}
+
+.pt-floor-marker {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 2.5px;
+  background: var(--ink-dark);
+  border-radius: 2px;
+  opacity: 0.55;
+}
+
+.pt-bar-scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.63rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  margin-top: 5px;
+}
+
+.pt-meals-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.pt-meal-btn {
+  border: 1.5px solid rgba(22, 21, 20, 0.12);
+  background: var(--card-pure);
+  color: var(--ink-dark);
+  border-radius: 14px;
+  padding: 8px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 3px 0 rgba(22, 21, 20, 0.06);
+}
+
+.pt-meal-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 rgba(22, 21, 20, 0.06);
+}
+
+.ptm-top {
+  font-family: "Syne", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.ptm-lbl {
+  font-size: 0.59rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.pt-meal-btn.checked {
+  background: var(--ink-dark);
+  border-color: var(--ink-dark);
+  color: #ffffff;
+}
+
+.protein-tracker-card.hit-target .pt-meal-btn.checked {
+  background: var(--forest-ink);
+  border-color: var(--forest-ink);
+}
+
+.pt-meal-btn.checked .ptm-lbl {
+  color: rgba(255, 255, 255, 0.76);
+}
+
+.pt-footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pt-quick-adjust {
+  display: flex;
+  gap: 6px;
+}
+
+.pt-adj-btn {
+  border: 1px solid var(--border-strong);
+  background: var(--card-pure);
+  color: var(--ink-dark);
+  font-size: 0.69rem;
+  font-weight: 800;
+  padding: 5px 9px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.pt-adj-btn.accent {
+  background: var(--clay-soft);
+  border-color: rgba(217, 78, 40, 0.3);
+  color: var(--clay-orange);
+}
+
+.creatine-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1.5px solid rgba(22, 21, 20, 0.14);
+  background: var(--card-pure);
+  color: var(--ink-mid);
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 5px 11px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.16s ease;
+}
+
+.cr-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(22, 21, 20, 0.2);
+}
+
+.creatine-pill.active {
+  background: var(--forest-ink);
+  border-color: var(--forest-ink);
+  color: #ffffff;
+}
+
+.creatine-pill.active .cr-dot {
+  background: var(--amber-gold);
+}
+
+/* Mode 03: Goal Switcher, Macro Grid, Meals, Volume Audit & Research */
+.goal-switcher {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.goal-pill {
+  border: 1.5px solid var(--border-hairline);
+  background: var(--card-pure);
+  color: var(--ink-dark);
+  border-radius: 16px;
+  padding: 10px 12px;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.18s ease;
+}
+
+.goal-pill.active {
+  background: var(--ink-dark);
+  border-color: var(--ink-dark);
+  color: #ffffff;
+  box-shadow: 0 8px 18px -6px rgba(22, 21, 20, 0.3);
+}
+
+.gp-title {
+  display: block;
+  font-family: "Syne", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 800;
+  margin-bottom: 2px;
+}
+
+.gp-sub {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--ink-mid);
+}
+
+.goal-pill.active .gp-sub {
+  color: var(--amber-gold);
+}
+
+.macro-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.macro-box {
+  background: var(--card-pure);
+  border: 1px solid var(--border-hairline);
+  border-radius: 16px;
+  padding: 10px;
+}
+
+.macro-box.primary {
+  background: var(--clay-soft);
+  border-color: rgba(217, 78, 40, 0.25);
+}
+
+.mb-kicker {
+  display: block;
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  margin-bottom: 3px;
+}
+
+.macro-box.primary .mb-kicker {
+  color: var(--clay-orange);
+}
+
+.mb-val {
+  display: block;
+  font-family: "Syne", sans-serif;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--ink-dark);
+  line-height: 1.1;
+}
+
+.macro-box.primary .mb-val {
+  color: var(--clay-orange);
+}
+
+.mb-sub {
+  display: block;
+  font-size: 0.64rem;
+  font-weight: 600;
+  color: var(--ink-mid);
+  margin-top: 3px;
+}
+
+.fd-item.highlight-row {
+  background: var(--clay-soft);
+  padding: 10px 12px;
+  border-radius: 12px;
+}
+
+.section-card {
+  background: var(--card-warm);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-xl);
+  padding: 20px;
+  margin-bottom: 18px;
+  box-shadow: var(--shadow-tactile);
+}
+
+.meal-ideas-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.meal-idea-card {
+  background: var(--card-pure);
+  border: 1px solid var(--border-hairline);
+  border-radius: 18px;
+  padding: 13px 14px;
+}
+
+.mi-tag {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--forest-ink);
+  margin-bottom: 2px;
+}
+
+.mi-title {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--ink-dark);
+  margin-bottom: 3px;
+}
+
+.mi-macros {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--clay-orange);
+  margin-bottom: 5px;
+}
+
+.mi-detail {
+  font-size: 0.77rem;
+  color: var(--ink-mid);
+  line-height: 1.42;
+}
+
+.volume-audit-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.vol-row {
+  background: var(--card-pure);
+  border: 1px solid var(--border-hairline);
+  border-radius: 14px;
+  padding: 10px 12px;
+}
+
+.vol-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.vol-muscle {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--ink-dark);
+}
+
+.vol-meta {
+  font-size: 0.72rem;
+  color: var(--ink-mid);
+}
+
+.vol-bar-track {
+  height: 7px;
+  background: rgba(22, 21, 20, 0.08);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.vol-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--clay-orange), var(--forest-ink));
+  border-radius: 99px;
+}
+
+.research-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.research-item {
+  background: var(--card-pure);
+  border: 1px solid var(--border-hairline);
+  border-radius: 16px;
+  padding: 12px 14px;
+}
+
+.res-study {
+  font-family: "Syne", sans-serif;
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: var(--ink-dark);
+  margin-bottom: 4px;
+}
+
+.res-finding {
+  font-size: 0.77rem;
+  color: var(--ink-mid);
+  line-height: 1.42;
+  margin-bottom: 5px;
+}
+
+.res-apply {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--forest-ink);
+  background: var(--forest-soft);
+  padding: 5px 9px;
+  border-radius: 9px;
+}
